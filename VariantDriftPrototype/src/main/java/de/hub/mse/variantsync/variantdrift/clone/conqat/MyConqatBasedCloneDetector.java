@@ -3,6 +3,9 @@ package de.hub.mse.variantsync.variantdrift.clone.conqat;
 import aatl.MatchedRule;
 import aatl.Module;
 import de.hub.mse.variantsync.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantsync.variantdrift.clone.models.GenericGraph;
+import de.hub.mse.variantsync.variantdrift.clone.util.GenericGraphToJGraph;
+import de.hub.mse.variantsync.variantdrift.clone.util.GraphViewer;
 import de.uni_marburg.fb12.swt.cloneDetection.atl.Link;
 import de.uni_marburg.fb12.swt.cloneDetection.atl.conqat.CloneGroup;
 import de.uni_marburg.fb12.swt.cloneDetection.atl.conqat.CloneGroupDetectionResult;
@@ -20,17 +23,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MyConqatBasedCloneDetector {
-    private IModelGraph modelGraph;
+    private GenericGraph modelGraph;
     protected Set<CloneGroup> result;
 
     boolean includeRhs;
     int minSubCloneSize;
 
-    public MyConqatBasedCloneDetector(IModelGraph modelGraph) {
+    public MyConqatBasedCloneDetector(GenericGraph modelGraph) {
         this.modelGraph = modelGraph;
     }
 
-    public MyConqatBasedCloneDetector(IModelGraph modelGraph, int minSubCloneSize) {
+    public MyConqatBasedCloneDetector(GenericGraph modelGraph, int minSubCloneSize) {
         this.modelGraph = modelGraph;
         this.minSubCloneSize = minSubCloneSize;
     }
@@ -40,17 +43,26 @@ public class MyConqatBasedCloneDetector {
         conqatManager.doCloneDetection();
         ModelCloneReporterMock reporter = conqatManager.getResultReporter();
 
-        result = new HashSet<CloneGroup>();
+        result = new HashSet<>();
         for (ModelCloneReporterMock.ModelClone clone : reporter.modelClones) {
-//            List<Module> involvedModules = conqatManager.getInvolvedModules(clone);
-//            List<MatchedRule> involvedRules = conqatManager.getInvolvedMatchedRules(clone);
-//            Map<EObject, Set<EObject>> nodeMappings = conqatManager.createNodeMappings(clone);
-//            Map<Link, Set<Link>> linkMappings = conqatManager.createLinkMappings(clone);
-//            if (!involvedRules.isEmpty()) {
-//                CloneGroup newCloneGroup = new CloneGroup(involvedModules, involvedRules, nodeMappings, linkMappings);
-//                result.add(newCloneGroup);
-//            }
+            visualizeClone(clone);
+            List<Module> involvedModules = conqatManager.getInvolvedModules(clone);
+            List<MatchedRule> involvedRules = conqatManager.getInvolvedMatchedRules(clone);
+            Map<EObject, Set<EObject>> nodeMappings = conqatManager.createNodeMappings(clone);
+            Map<Link, Set<Link>> linkMappings = conqatManager.createLinkMappings(clone);
+            if (!involvedRules.isEmpty()) {
+                CloneGroup newCloneGroup = new CloneGroup(involvedModules, involvedRules, nodeMappings, linkMappings);
+                result.add(newCloneGroup);
+            }
         }
+    }
+
+    private static void visualizeClone(ModelCloneReporterMock.ModelClone clone) {
+        var nodes = clone.nodes.get(0);
+        var edges = clone.edges.get(0);
+        var graph = new GenericGraph(new HashSet<>(nodes), new HashSet<>(edges));
+        var jGraph = new GenericGraphToJGraph().transform(graph);
+        GraphViewer.viewGraph(jGraph, "Clone");
     }
 
     protected ModelCloneReporterMock runDetection() throws Exception {

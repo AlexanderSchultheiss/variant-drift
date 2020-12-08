@@ -45,7 +45,8 @@ public class PlayingAround {
         }
 
         IModelGraph modelGraph = new EMF2GenericGraph().transform(models);
-        IModelGraph filteredGraph = ((GenericGraph) modelGraph).simulateSmallerGraph();
+//        GenericGraph filteredGraph = (GenericGraph) modelGraph;
+        GenericGraph filteredGraph = ((GenericGraph) modelGraph).simulateSmallerGraph();
 
         var cloneDetector = new MyConqatBasedCloneDetector(filteredGraph);
         cloneDetector.detectCloneGroups();

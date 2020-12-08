@@ -17,15 +17,14 @@ public class EMF2GenericGraph {
 	Resource model;
 	GenericGraph graph;
 
-	Map<EObject, GenericNode> eObject2Node;
-	Map<GenericNode, EObject> node2eObject;
+	Map<EObject, GenericNode> eObject2Node = new HashMap<>();
+	Map<GenericNode, EObject> node2eObject = new HashMap<>();
+	Map<EReference, GenericEdge> eReference2Edge = new HashMap<>();
+	Map<GenericEdge, EReference> edge2eReference = new HashMap<>();
 
 	public IModelGraph transform(Resource model) {
 		this.model = model;
 		this.graph = new GenericGraph();
-
-		this.eObject2Node = new HashMap<>();
-		this.node2eObject = new HashMap<>();
 
 		transformNodes();
 		transformEdges();
@@ -34,13 +33,17 @@ public class EMF2GenericGraph {
 	}
 
 	public IModelGraph transform(Collection<Resource> models) {
-		IModelGraph resultGraph = new GenericGraph();
+		GenericGraph resultGraph = new GenericGraph();
 		for (var model : models) {
 			IModelGraph tempGraph = this.transform(model);
 			resultGraph.getNodes().addAll(tempGraph.getNodes());
 			resultGraph.getEdges().addAll(tempGraph.getEdges());
 		}
 
+		resultGraph.setEObject2Node(this.eObject2Node);
+		resultGraph.setNode2eObject(this.node2eObject);
+		resultGraph.seteReference2Edge(this.eReference2Edge);
+		resultGraph.setEdge2eReference(this.edge2eReference);
 		return resultGraph;
 	}
 
@@ -50,9 +53,11 @@ public class EMF2GenericGraph {
 
 			GenericNode node = new GenericNode(eObject.eClass().getName());
 
-			graph.getNodes().add(node);
-			eObject2Node.put(eObject, node);
-			node2eObject.put(node, eObject);
+			if (!eObject2Node.containsKey(eObject)) {
+				eObject2Node.put(eObject, node);
+				node2eObject.put(node, eObject);
+				graph.getNodes().add(node);
+			}
 		}
 	}
 
@@ -84,7 +89,12 @@ public class EMF2GenericGraph {
 
 		if (src != null && tgt != null) {
 			GenericEdge edge = new GenericEdge(eReference.getName(), src, tgt);
-			graph.getEdges().add(edge);
+
+			if (!eReference2Edge.containsKey(eReference)) {
+				eReference2Edge.put(eReference, edge);
+				edge2eReference.put(edge, eReference);
+				graph.getEdges().add(edge);
+			}
 		}
 	}
 
