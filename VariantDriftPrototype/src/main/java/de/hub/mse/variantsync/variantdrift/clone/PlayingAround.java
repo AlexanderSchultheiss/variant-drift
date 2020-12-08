@@ -3,8 +3,11 @@ package de.hub.mse.variantsync.variantdrift.clone;
 import de.hub.mse.variantsync.variantdrift.clone.conqat.MyConqatBasedCloneDetector;
 import de.hub.mse.variantsync.variantdrift.clone.models.GenericGraph;
 import de.hub.mse.variantsync.variantdrift.clone.util.EMF2GenericGraph;
+import de.hub.mse.variantsync.variantdrift.clone.util.EdgeMapping;
+import de.hub.mse.variantsync.variantdrift.clone.util.NodeMapping;
 import org.conqat.engine.model_clones.model.IModelGraph;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.henshin.model.staticanalysis.NodeMap;
 import org.eclipse.uml2.uml.Class;
 import org.eclipse.uml2.uml.Feature;
 import org.eclipse.uml2.uml.Model;
@@ -44,9 +47,17 @@ public class PlayingAround {
             }
         }
 
-        IModelGraph modelGraph = new EMF2GenericGraph().transform(models);
+        List<GenericGraph> modelGraphs = new LinkedList<>();
+        List<NodeMapping> nodeMappings = new LinkedList<>();
+        List<EdgeMapping> edgeMappings = new LinkedList<>();
+        for (var model : models) {
+            EMF2GenericGraph.ParseResult parseResult = EMF2GenericGraph.transform(model);
+            modelGraphs.add(parseResult.graph);
+            nodeMappings.add(parseResult.nodeMapping);
+            edgeMappings.add(parseResult.edgeMapping);
+        }
 //        GenericGraph filteredGraph = (GenericGraph) modelGraph;
-        GenericGraph filteredGraph = ((GenericGraph) modelGraph).simulateSmallerGraph();
+        GenericGraph filteredGraph = (GenericGraph.fromGraphs(modelGraphs)).simulateSmallerGraph();
 
         var cloneDetector = new MyConqatBasedCloneDetector(filteredGraph);
         cloneDetector.detectCloneGroups();

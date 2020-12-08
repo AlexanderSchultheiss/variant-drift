@@ -29,14 +29,14 @@ public class Demo {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Resource model = loadModel("C:\\develop\\work\\VariantDrift\\VariantDriftEMSE\\VariantDriftPrototype\\models\\ppu\\Scen00.uml");
 		
-		EMF2GenericGraph emf2graph = new EMF2GenericGraph();
-		IModelGraph graph = emf2graph.transform(model);
-	
-		System.out.println(graph);
-
-		var parser = new GenericGraphToJGraph();
-		Graph<INode, IDirectedEdge> jGraph = parser.transform(graph);
-		GraphViewer.viewGraph(jGraph, "Test graph");
+//		EMF2GenericGraph emf2graph = new EMF2GenericGraph();
+//		IModelGraph graph = emf2graph.transform(model);
+//
+//		System.out.println(graph);
+//
+//		var parser = new GenericGraphToJGraph();
+//		Graph<INode, IDirectedEdge> jGraph = parser.transform(graph);
+//		GraphViewer.viewGraph(jGraph, "Test graph");
 	}
 
 	public static Resource loadModel(String fileName) throws FileNotFoundException, IOException {

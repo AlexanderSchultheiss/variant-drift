@@ -121,7 +121,7 @@ public class MyConqatManager {
 
             while (var5.hasNext()) {
                 GenericNode node = (GenericNode) var5.next();
-                EObject container = this.modelGraph.getEObject(node);
+                EObject container = null;
 
                 while (!(container instanceof Package) && container != null) {
                     container = container.eContainer();
