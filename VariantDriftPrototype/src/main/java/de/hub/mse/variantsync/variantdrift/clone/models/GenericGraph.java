@@ -38,4 +38,27 @@ public class GenericGraph implements IModelGraph {
         this.edges.forEach(e -> sb.append(e.toString()).append("\n"));
         return sb.toString();
     }
+
+    public GenericGraph simulateSmallerGraph() {
+        Set<INode> nodes = new HashSet<>();
+        Set<IDirectedEdge> edges = new HashSet<>();
+        for (var node : this.nodes) {
+            if (node.getEquivalenceClassLabel().equals("Class") || node.getEquivalenceClassLabel().equals("Association")
+                    || node.getEquivalenceClassLabel().equals("Property")
+//                    || node.getEquivalenceClassLabel().equals("Parameter")
+//                    || node.getEquivalenceClassLabel().equals("Operation")
+//                    || node.getEquivalenceClassLabel().equals("EnumerationLiteral")
+//                    || node.getEquivalenceClassLabel().equals("Enumeration")
+//                    || node.getEquivalenceClassLabel().equals("Generalization")
+                    || node.getEquivalenceClassLabel().equals("Package")) {
+                nodes.add(node);
+            }
+        }
+        for (var edge : this.edges) {
+            if (nodes.contains(edge.getSourceNode()) && nodes.contains(edge.getTargetNode())) {
+                edges.add(edge);
+            }
+        }
+        return new GenericGraph(nodes, edges);
+    }
 }

@@ -1,13 +1,13 @@
 package de.hub.mse.variantsync.variantdrift.clone.util;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import aatl.MatchedRule;
 import de.hub.mse.variantsync.variantdrift.clone.models.GenericEdge;
 import de.hub.mse.variantsync.variantdrift.clone.models.GenericGraph;
 import de.hub.mse.variantsync.variantdrift.clone.models.GenericNode;
+import org.conqat.engine.model_clones.model.IModelGraph;
+import org.conqat.engine.model_clones.model.ModelGraphMock;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -20,17 +20,28 @@ public class EMF2GenericGraph {
 	Map<EObject, GenericNode> eObject2Node;
 	Map<GenericNode, EObject> node2eObject;
 
-	public GenericGraph transform(Resource model) {
+	public IModelGraph transform(Resource model) {
 		this.model = model;
 		this.graph = new GenericGraph();
 
-		this.eObject2Node = new HashMap<EObject, GenericNode>();
-		this.node2eObject = new HashMap<GenericNode, EObject>();
+		this.eObject2Node = new HashMap<>();
+		this.node2eObject = new HashMap<>();
 
 		transformNodes();
 		transformEdges();
 
 		return graph;
+	}
+
+	public IModelGraph transform(Collection<Resource> models) {
+		IModelGraph resultGraph = new GenericGraph();
+		for (var model : models) {
+			IModelGraph tempGraph = this.transform(model);
+			resultGraph.getNodes().addAll(tempGraph.getNodes());
+			resultGraph.getEdges().addAll(tempGraph.getEdges());
+		}
+
+		return resultGraph;
 	}
 
 	private void transformNodes() {

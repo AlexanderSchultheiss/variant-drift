@@ -11,6 +11,7 @@ import de.hub.mse.variantsync.variantdrift.clone.util.EMF2GenericGraph;
 import de.hub.mse.variantsync.variantdrift.clone.util.GenericGraphToJGraph;
 import de.hub.mse.variantsync.variantdrift.clone.util.GraphViewer;
 import org.conqat.engine.model_clones.model.IDirectedEdge;
+import org.conqat.engine.model_clones.model.IModelGraph;
 import org.conqat.engine.model_clones.model.INode;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -29,7 +30,7 @@ public class Demo {
 		Resource model = loadModel("C:\\develop\\work\\VariantDrift\\VariantDriftEMSE\\VariantDriftPrototype\\models\\ppu\\Scen00.uml");
 		
 		EMF2GenericGraph emf2graph = new EMF2GenericGraph();
-		GenericGraph graph = emf2graph.transform(model);
+		IModelGraph graph = emf2graph.transform(model);
 	
 		System.out.println(graph);
 
@@ -38,7 +39,7 @@ public class Demo {
 		GraphViewer.viewGraph(jGraph, "Test graph");
 	}
 
-	private static Resource loadModel(String fileName) throws FileNotFoundException, IOException {
+	public static Resource loadModel(String fileName) throws FileNotFoundException, IOException {
 		XMIResourceImpl resource = new XMIResourceImpl();
 		File source = new File(fileName);
 		resource.load(new FileInputStream(source), new HashMap<Object, Object>());

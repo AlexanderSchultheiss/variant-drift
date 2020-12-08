@@ -3,16 +3,17 @@ package de.hub.mse.variantsync.variantdrift.clone.util;
 import de.hub.mse.variantsync.variantdrift.clone.models.GenericEdge;
 import de.hub.mse.variantsync.variantdrift.clone.models.GenericGraph;
 import org.conqat.engine.model_clones.model.IDirectedEdge;
+import org.conqat.engine.model_clones.model.IModelGraph;
 import org.conqat.engine.model_clones.model.INode;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedPseudograph;
 
 
 public class GenericGraphToJGraph {
-    GenericGraph genericGraph;
+    IModelGraph genericGraph;
     Graph<INode, IDirectedEdge> jGraph;
 
-    public Graph<INode, IDirectedEdge> transform(GenericGraph genericGraph) {
+    public Graph<INode, IDirectedEdge> transform(IModelGraph genericGraph) {
         this.genericGraph = genericGraph;
         this.jGraph = new DirectedPseudograph<>(GenericEdge.class);
 

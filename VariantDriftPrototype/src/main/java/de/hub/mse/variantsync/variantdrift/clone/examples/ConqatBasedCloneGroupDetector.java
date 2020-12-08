@@ -4,6 +4,7 @@
 //import aatl.Module;
 //import de.uni_marburg.fb12.swt.cloneDetection.atl.AbstractCloneGroupDetector;
 //import de.uni_marburg.fb12.swt.cloneDetection.atl.Link;
+//import de.uni_marburg.fb12.swt.cloneDetection.atl.conqat.ConqatManager;
 //import org.conqat.engine.model_clones.detection.ModelCloneReporterMock;
 //import org.conqat.engine.model_clones.detection.ModelCloneReporterMock.ModelClone;
 //import org.eclipse.emf.ecore.EObject;
