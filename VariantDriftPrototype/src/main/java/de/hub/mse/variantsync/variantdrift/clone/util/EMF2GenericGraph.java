@@ -39,7 +39,7 @@ public class EMF2GenericGraph {
 
 			GenericNode node = new GenericNode(eObject.eClass().getName());
 
-			graph.nodes.add(node);
+			graph.getNodes().add(node);
 			eObject2Node.put(eObject, node);
 			node2eObject.put(node, eObject);
 		}
@@ -73,7 +73,7 @@ public class EMF2GenericGraph {
 
 		if (src != null && tgt != null) {
 			GenericEdge edge = new GenericEdge(eReference.getName(), src, tgt);
-			graph.edges.add(edge);
+			graph.getEdges().add(edge);
 		}
 	}
 

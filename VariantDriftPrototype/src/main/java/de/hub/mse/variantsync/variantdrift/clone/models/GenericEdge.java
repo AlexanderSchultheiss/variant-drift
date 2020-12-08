@@ -20,17 +20,17 @@ public class GenericEdge implements IDirectedEdge {
 
     @Override
     public INode getSourceNode() {
-        return null;
+        return sourceNode;
     }
 
     @Override
     public INode getTargetNode() {
-        return null;
+        return targetNode;
     }
 
     @Override
     public String getEquivalenceClassLabel() {
-        return null;
+        return label;
     }
 
     @Override

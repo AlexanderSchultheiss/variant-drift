@@ -7,8 +7,8 @@ import org.conqat.engine.model_clones.model.INode;
 import java.util.*;
 
 public class GenericGraph implements IModelGraph {
-    public final Set<INode> nodes;
-    public final Set<IDirectedEdge> edges;
+    private final Set<INode> nodes;
+    private final Set<IDirectedEdge> edges;
 
     public GenericGraph() {
         this.nodes = new HashSet<>();
