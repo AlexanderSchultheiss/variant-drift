@@ -40,7 +40,7 @@ public class PlayingAround {
             System.out.println(file.getName());
             Resource model = loadModel(file.getAbsolutePath());
             models.add(model);
-            if (i > 0) {
+            if (i > 14) {
                 break;
             } else {
                 i++;
@@ -57,7 +57,8 @@ public class PlayingAround {
             edgeMappings.add(parseResult.edgeMapping);
         }
 //        GenericGraph filteredGraph = (GenericGraph) modelGraph;
-        GenericGraph filteredGraph = (GenericGraph.fromGraphs(modelGraphs)).simulateSmallerGraph();
+        var graph = GenericGraph.fromGraphs(modelGraphs);
+        GenericGraph filteredGraph = graph.simulateSmallerGraph();
 
         var cloneDetector = new MyConqatBasedCloneDetector(filteredGraph);
         cloneDetector.detectCloneGroups();

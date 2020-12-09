@@ -56,15 +56,15 @@ public class GenericGraph implements IModelGraph {
         Set<INode> nodes = new HashSet<>();
         Set<IDirectedEdge> edges = new HashSet<>();
         for (var node : this.nodes) {
-            if (node.getEquivalenceClassLabel().equals("Class")
-                    || node.getEquivalenceClassLabel().equals("Association")
-//                    || node.getEquivalenceClassLabel().equals("Property")
-//                    || node.getEquivalenceClassLabel().equals("Parameter")
-//                    || node.getEquivalenceClassLabel().equals("Operation")
-                    || node.getEquivalenceClassLabel().equals("EnumerationLiteral")
-                    || node.getEquivalenceClassLabel().equals("Enumeration")
-                    || node.getEquivalenceClassLabel().equals("Generalization")
-                    || node.getEquivalenceClassLabel().equals("Package")
+            if (node.getEquivalenceClassLabel().contains("Class")
+                    || node.getEquivalenceClassLabel().contains("Association")
+//                    || node.getEquivalenceClassLabel().contains("Property")
+//                    || node.getEquivalenceClassLabel().contains("Parameter")
+//                    || node.getEquivalenceClassLabel().contains("Operation")
+//                    || node.getEquivalenceClassLabel().contains("EnumerationLiteral")
+//                    || node.getEquivalenceClassLabel().contains("Enumeration")
+//                    || node.getEquivalenceClassLabel().contains("Generalization")
+                    || node.getEquivalenceClassLabel().contains("Package")
             ) {
                 nodes.add(node);
             }

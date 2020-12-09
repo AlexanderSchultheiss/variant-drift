@@ -21,19 +21,6 @@ public class EMF2GenericGraph {
     NodeMapping nodeMapping;
     EdgeMapping edgeMapping;
 
-    public static class ParseResult {
-        public GenericGraph graph;
-        public NodeMapping nodeMapping;
-        public EdgeMapping edgeMapping;
-
-        public ParseResult(GenericGraph graph, NodeMapping nodeMapping, EdgeMapping edgeMapping) {
-            this.graph = graph;
-            this.nodeMapping = nodeMapping;
-            this.edgeMapping = edgeMapping;
-        }
-    }
-
-
     private EMF2GenericGraph(Resource model) {
         this.model = model;
         this.graph = new GenericGraph();
@@ -53,8 +40,14 @@ public class EMF2GenericGraph {
     private void transformNodes() {
         for (Iterator<EObject> it = model.getAllContents(); it.hasNext(); ) {
             EObject eObject = it.next();
-
-            GenericNode node = new GenericNode(eObject.eClass().getName());
+            String name = "";
+            if (eObject.eClass().getEStructuralFeature("name") != null) {
+                var tempName = eObject.eGet(eObject.eClass().getEStructuralFeature("name"));
+                if (tempName != null) {
+                    name = tempName.toString();
+                }
+            }
+            GenericNode node = new GenericNode(eObject.eClass().getName() + name);
 
             if (!nodeMapping.contains(eObject)) {
                 nodeMapping.put(eObject, node);
@@ -67,22 +60,21 @@ public class EMF2GenericGraph {
         for (Iterator<EObject> it = model.getAllContents(); it.hasNext(); ) {
             EObject eObject = it.next();
 
-            for (EStructuralFeature structuralFeature : eObject.eClass().getEAllStructuralFeatures()) {
-                if (structuralFeature.isDerived()) {
+            for (var eReference : eObject.eClass().getEAllReferences()) {
+                if (eReference.isDerived()) {
                     continue;
                 }
 
-                if (structuralFeature instanceof EReference eReference) {
-                    if (eReference.isMany()) {
-                        List<EObject> referencedObjects = (List<EObject>) eObject.eGet(eReference);
-                        for (EObject referencedObject : referencedObjects) {
-                            transformEdge(eReference, eObject, referencedObject);
-                        }
-                    } else {
-                        EObject referencedObject = (EObject) eObject.eGet(eReference);
+                if (eReference.isMany()) {
+                    List<EObject> referencedObjects = (List<EObject>) eObject.eGet(eReference);
+                    for (EObject referencedObject : referencedObjects) {
                         transformEdge(eReference, eObject, referencedObject);
                     }
+                } else {
+                    EObject referencedObject = (EObject) eObject.eGet(eReference);
+                    transformEdge(eReference, eObject, referencedObject);
                 }
+
             }
         }
     }
@@ -93,12 +85,24 @@ public class EMF2GenericGraph {
 
         if (src != null && tgt != null) {
             GenericEdge edge = new GenericEdge(eReference.getName(), src, tgt);
-
-            if (!edgeMapping.contains(eReference)) {
-                edgeMapping.put(eReference, edge);
-                edgeMapping.put(edge, eReference);
+            EReferenceInstance referenceInstance = new EReferenceInstance(eReference, srcObject, tgtObject);
+            if (!edgeMapping.contains(referenceInstance)) {
+                edgeMapping.put(referenceInstance, edge);
+                edgeMapping.put(edge, referenceInstance);
                 graph.getEdges().add(edge);
             }
+        }
+    }
+
+    public static class ParseResult {
+        public GenericGraph graph;
+        public NodeMapping nodeMapping;
+        public EdgeMapping edgeMapping;
+
+        public ParseResult(GenericGraph graph, NodeMapping nodeMapping, EdgeMapping edgeMapping) {
+            this.graph = graph;
+            this.nodeMapping = nodeMapping;
+            this.edgeMapping = edgeMapping;
         }
     }
 
