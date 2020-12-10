@@ -22,14 +22,13 @@ public abstract class MyAbstractCloneGroupDetector {
     }
 
     public CloneGroupDetectionResult getResultOrderedByNumberOfCommonElements() {
-        List<CloneGroupMapping> orderedResult = new ArrayList();
-        orderedResult.addAll(this.result);
+        List<CloneGroupMapping> orderedResult = new ArrayList<>(this.result);
         Comparator<CloneGroupMapping> comp = new Comparator<CloneGroupMapping>() {
             public int compare(CloneGroupMapping arg0, CloneGroupMapping arg1) {
                 return arg1.getNumberOfCommonEdges() - arg0.getNumberOfCommonEdges();
             }
         };
-        Collections.sort(orderedResult, comp);
+        orderedResult.sort(comp);
         return new CloneGroupDetectionResult(orderedResult);
     }
 

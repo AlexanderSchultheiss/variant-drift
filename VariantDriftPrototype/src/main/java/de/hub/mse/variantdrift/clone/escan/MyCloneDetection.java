@@ -23,7 +23,7 @@ public abstract class MyCloneDetection extends MyAbstractCloneGroupDetector {
         this.ruleGraphMap = this.getRuleGraphMap(this.ruleSet);
         this.ruleList = this.getRuleList(this.ruleSet);
         this.considerAttributeNodes = true;
-        this.resultAsCloneMatrix = new HashSet();
+        this.resultAsCloneMatrix = new HashSet<>();
         this.result = null;
     }
 
@@ -35,7 +35,7 @@ public abstract class MyCloneDetection extends MyAbstractCloneGroupDetector {
         this.ruleGraphMap = ruleGraphMap;
         this.ruleList = ruleList;
         this.considerAttributeNodes = considerAttributeNodes;
-        this.resultAsCloneMatrix = new HashSet();
+        this.resultAsCloneMatrix = new HashSet<>();
     }
 
     public Set<CloneMatrix> getResultAsCloneMatrix() {
@@ -47,9 +47,7 @@ public abstract class MyCloneDetection extends MyAbstractCloneGroupDetector {
     }
 
     protected Set<Rule> getRuleSet(Collection<Rule> rules) {
-        Set<Rule> ruleSet = new HashSet();
-        ruleSet.addAll(rules);
-        return ruleSet;
+        return new HashSet<>(rules);
     }
 
     private Map<Rule, DirectedGraph<Node, CapsuleEdge>> getRuleGraphMap(Set<Rule> ruleSet) {
@@ -58,25 +56,13 @@ public abstract class MyCloneDetection extends MyAbstractCloneGroupDetector {
     }
 
     protected List<Rule> getRuleList(Set<Rule> ruleSet) {
-        List<Rule> ruleList = new LinkedList();
-        ruleList.addAll(ruleSet);
-
-        Rule var4;
-        for(Iterator var3 = ruleList.iterator(); var3.hasNext(); var4 = (Rule)var3.next()) {
-        }
-
-        return ruleList;
+        return new LinkedList<>(ruleSet);
     }
 
     public CloneGroupDetectionResultAsCloneMatrix getResultAsCloneMatrixOrderedByNumberOfCommonElements() {
-        List<CloneMatrix> orderedResult = new ArrayList();
-        orderedResult.addAll(this.resultAsCloneMatrix);
-        Comparator<CloneMatrix> comp = new Comparator<CloneMatrix>() {
-            public int compare(CloneMatrix arg0, CloneMatrix arg1) {
-                return arg1.getNumberOfCommonEdges() - arg0.getNumberOfCommonEdges();
-            }
-        };
-        Collections.sort(orderedResult, comp);
+        List<CloneMatrix> orderedResult = new ArrayList<>(this.resultAsCloneMatrix);
+        Comparator<CloneMatrix> comp = (arg0, arg1) -> arg1.getNumberOfCommonEdges() - arg0.getNumberOfCommonEdges();
+        orderedResult.sort(comp);
         return new CloneGroupDetectionResultAsCloneMatrix(orderedResult);
     }
 

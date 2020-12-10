@@ -29,11 +29,11 @@ public class MyEScanDetectionArticle extends MyEScanDetection {
         Set<Fragment> layer1 = this.clones1(all1Fragments);
         Set<CapsuleEdge> edgesLayer1 = this.extractEdges(layer1);
         lattice.add(layer1);
-        int startLayer = 1;
+        int startLayer = 0;
 
-        for (Object o : lattice.get(startLayer - 1)) {
+        for (Object o : lattice.get(startLayer)) {
             Fragment f1 = (Fragment) o;
-            this.discover(f1, this.clones(f1, lattice.get(startLayer - 1)), lattice, edgesLayer1, startLayer);
+            this.discover(f1, this.clones(f1, lattice.get(startLayer)), lattice, edgesLayer1, startLayer);
         }
 
         return this.eScanGroupAndFilterLattice(lattice);
