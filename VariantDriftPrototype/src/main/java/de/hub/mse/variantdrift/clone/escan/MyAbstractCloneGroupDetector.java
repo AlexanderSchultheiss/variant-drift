@@ -1,9 +1,5 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import org.eclipse.emf.henshin.model.Rule;
-import org.eclipse.emf.henshin.variability.ui.clonedetector.CloneGroupDetectionResult;
-import org.eclipse.emf.henshin.variability.ui.clonedetector.CloneGroupMapping;
-
 import java.util.*;
 
 public abstract class MyAbstractCloneGroupDetector {

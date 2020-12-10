@@ -3,8 +3,6 @@ package de.hub.mse.variantdrift.clone.escan;
 import de.uni_marburg.fb12.swt.cloneDetection.cloneDetection.CloneMatrixCreator;
 import de.uni_marburg.fb12.swt.cloneDetection.henshinToIntegrated.CapsuleEdge;
 import de.uni_marburg.fb12.swt.cloneDetection.modelCd.Fragment;
-import org.eclipse.emf.henshin.model.Node;
-import org.eclipse.emf.henshin.model.Rule;
 import org.jgrapht.DirectedGraph;
 
 import java.util.*;
