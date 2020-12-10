@@ -1,39 +1,42 @@
 package de.hub.mse.variantdrift.clone.escan;
 
+import de.hub.mse.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantdrift.clone.models.GenericNode;
 import de.uni_marburg.fb12.swt.cloneDetection.cloneDetection.CloneGroupDetectionResultAsCloneMatrix;
 import de.uni_marburg.fb12.swt.cloneDetection.cloneDetection.CloneMatrix;
 import de.uni_marburg.fb12.swt.cloneDetection.henshinToIntegrated.ExtendedIntegratedGraphConverter;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.jgrapht.DirectedGraph;
 
 import java.util.*;
 
 public abstract class MyCloneDetection extends MyAbstractCloneGroupDetector {
+    protected final Set<Resource> ruleSet;
+    protected final Map<Resource, DirectedGraph<GenericNode, GenericEdge>> ruleGraphMap;
+    protected final List<Resource> ruleList;
+    protected final boolean considerAttributeGenericNodes;
     protected Set<CloneMatrix> resultAsCloneMatrix;
-    protected final Set<Rule> ruleSet;
-    protected final Map<Rule, DirectedGraph<Node, CapsuleEdge>> ruleGraphMap;
-    protected final List<Rule> ruleList;
-    protected final boolean considerAttributeNodes;
 
-    public MyCloneDetection(Collection<Rule> rules) {
+    public MyCloneDetection(Collection<Resource> rules) {
         super(rules);
-        this.ruleSet = this.getRuleSet(rules);
-        this.ruleGraphMap = this.getRuleGraphMap(this.ruleSet);
-        this.ruleList = this.getRuleList(this.ruleSet);
-        this.considerAttributeNodes = true;
+        this.ruleSet = this.getResourceSet(rules);
+        this.ruleGraphMap = this.getResourceGraphMap(this.ruleSet);
+        this.ruleList = this.getResourceList(this.ruleSet);
+        this.considerAttributeGenericNodes = true;
         this.resultAsCloneMatrix = new HashSet<>();
         this.result = null;
     }
 
-    public abstract void detectCloneGroups();
-
-    public MyCloneDetection(Map<Rule, DirectedGraph<Node, CapsuleEdge>> ruleGraphMap, List<Rule> ruleList, boolean considerAttributeNodes) {
+    public MyCloneDetection(Map<Resource, DirectedGraph<GenericNode, GenericEdge>> ruleGraphMap, List<Resource> ruleList, boolean considerAttributeGenericNodes) {
         super(ruleGraphMap.keySet());
         this.ruleSet = ruleGraphMap.keySet();
         this.ruleGraphMap = ruleGraphMap;
         this.ruleList = ruleList;
-        this.considerAttributeNodes = considerAttributeNodes;
+        this.considerAttributeGenericNodes = considerAttributeGenericNodes;
         this.resultAsCloneMatrix = new HashSet<>();
     }
+
+    public abstract void detectCloneGroups();
 
     public Set<CloneMatrix> getResultAsCloneMatrix() {
         return this.resultAsCloneMatrix;
@@ -43,16 +46,17 @@ public abstract class MyCloneDetection extends MyAbstractCloneGroupDetector {
         return 3;
     }
 
-    protected Set<Rule> getRuleSet(Collection<Rule> rules) {
+    protected Set<Resource> getResourceSet(Collection<Resource> rules) {
         return new HashSet<>(rules);
     }
 
-    private Map<Rule, DirectedGraph<Node, CapsuleEdge>> getRuleGraphMap(Set<Rule> ruleSet) {
+    private Map<Resource, DirectedGraph<GenericNode, GenericEdge>> getResourceGraphMap(Set<Resource> ruleSet) {
         ExtendedIntegratedGraphConverter graphConverter = new ExtendedIntegratedGraphConverter();
-        return graphConverter.getRuleToGraphWithAttributesMap(ruleSet);
+//        return graphConverter.getResourceToGraphWithAttributesMap(ruleSet);
+        return null;
     }
 
-    protected List<Rule> getRuleList(Set<Rule> ruleSet) {
+    protected List<Resource> getResourceList(Set<Resource> ruleSet) {
         return new LinkedList<>(ruleSet);
     }
 
@@ -102,7 +106,7 @@ public abstract class MyCloneDetection extends MyAbstractCloneGroupDetector {
         if (sec < 60L) {
             return "Running time: " + sec + " sec.\n";
         } else {
-            int min = (int)(sec / 60L);
+            int min = (int) (sec / 60L);
             sec %= 60L;
             String res = "Running time: " + min + " min. " + sec + " sec.\n";
             return res;

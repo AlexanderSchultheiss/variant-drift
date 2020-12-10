@@ -1,25 +1,22 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import de.uni_marburg.fb12.swt.cloneDetection.henshinToIntegrated.CapsuleEdge;
-import de.uni_marburg.fb12.swt.cloneDetection.modelCdCanonicalLabel.CanonicalLabelForFragmentCreator;
-import org.eclipse.emf.henshin.model.Attribute;
-import org.eclipse.emf.henshin.model.Edge;
-import org.eclipse.emf.henshin.model.Node;
-import org.eclipse.emf.henshin.model.Rule;
+import de.hub.mse.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantdrift.clone.models.GenericNode;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
 import java.util.*;
 
 public class MyFragment {
-    private final List<CapsuleEdge> orderedCapsuleEdges;
-    private final Rule rule;
-    private final DirectedGraph<Node, CapsuleEdge> graph;
+    private final List<GenericEdge> orderedGenericEdges;
+    private final Resource model;
+    private final DirectedGraph<GenericNode, GenericEdge> graph;
     private final String label;
-    private CapsuleEdge lastNotDisconnectingCapsuleEdge;
+    private GenericEdge lastNotDisconnectingGenericEdge;
 
     public int hashCode() {
-        int res = this.rule.getName().hashCode();
+        int res = this.model.getURI().hashCode();
         res += this.label.hashCode();
         return res;
     }
@@ -27,10 +24,10 @@ public class MyFragment {
     @Override
     public boolean equals(Object o) {
         if (o instanceof MyFragment fragment) {
-            if (this.rule != fragment.rule) {
+            if (this.model != fragment.model) {
                 return false;
             } else {
-                return fragment.orderedCapsuleEdges.equals(this.orderedCapsuleEdges);
+                return fragment.orderedGenericEdges.equals(this.orderedGenericEdges);
             }
         } else {
             return false;
@@ -42,14 +39,14 @@ public class MyFragment {
     }
 
     public String toString() {
-        String var10000 = this.rule.getName();
+        String var10000 = this.model.getURI().toString();
         return var10000 + "\n Label: " + this.label;
     }
 
-    public Set<Node> getNodes() {
-        Set<Node> nodes = new HashSet<>();
+    public Set<GenericNode> getGenericNodes() {
+        Set<GenericNode> nodes = new HashSet<>();
 
-        for (CapsuleEdge capsuleEdge : this.orderedCapsuleEdges) {
+        for (GenericEdge capsuleEdge : this.orderedGenericEdges) {
             nodes.add(this.graph.getEdgeSource(capsuleEdge));
             nodes.add(this.graph.getEdgeTarget(capsuleEdge));
         }
@@ -57,109 +54,105 @@ public class MyFragment {
         return nodes;
     }
 
-    public Set<Node> getOriginalNodes() {
-        Set<Node> nodes = new HashSet<>();
+    public Set<GenericNode> getOriginalGenericNodes() {
+        Set<GenericNode> nodes = new HashSet<>();
 
-        for (CapsuleEdge capsuleEdge : this.orderedCapsuleEdges) {
-            if (!capsuleEdge.isAttributeEdge()) {
+        for (GenericEdge capsuleEdge : this.orderedGenericEdges) {
                 nodes.add(this.graph.getEdgeSource(capsuleEdge));
                 nodes.add(this.graph.getEdgeTarget(capsuleEdge));
-            } else {
-                nodes.add(this.graph.getEdgeSource(capsuleEdge));
-            }
         }
 
         return nodes;
     }
 
-    public List<CapsuleEdge> getCapsuleEdges() {
-        return this.orderedCapsuleEdges;
+    public List<GenericEdge> getGenericEdges() {
+        return this.orderedGenericEdges;
     }
 
     public int size() {
-        return this.orderedCapsuleEdges.size();
+        return this.orderedGenericEdges.size();
     }
 
-    public Set<Edge> getOriginalEdges() {
-        Set<Edge> res = new HashSet<>();
+//    public Set<Edge> getOriginalEdges() {
+//        Set<Edge> res = new HashSet<>();
+//
+//        for (GenericEdge e : this.orderedGenericEdges) {
+//            if (!e.isAttributeEdge()) {
+//                res.add(e.getOriginalEdge());
+//            }
+//        }
+//
+//        return res;
+//    }
+//
+//    public Set<Attribute> getAttributes() {
+//        Set<Attribute> res = new HashSet<>();
+//
+//        for (GenericEdge e : this.orderedGenericEdges) {
+//            if (e.isAttributeEdge()) {
+//                res.add(e.getAttribute());
+//            }
+//        }
+//
+//        return res;
+//    }
 
-        for (CapsuleEdge e : this.orderedCapsuleEdges) {
-            if (!e.isAttributeEdge()) {
-                res.add(e.getOriginalEdge());
-            }
-        }
-
-        return res;
+    public Resource getResource() {
+        return this.model;
     }
 
-    public Set<Attribute> getAttributes() {
-        Set<Attribute> res = new HashSet<>();
-
-        for (CapsuleEdge e : this.orderedCapsuleEdges) {
-            if (e.isAttributeEdge()) {
-                res.add(e.getAttribute());
-            }
-        }
-
-        return res;
-    }
-
-    public Rule getRule() {
-        return this.rule;
-    }
-
-    public DirectedGraph<Node, CapsuleEdge> getGraph() {
+    public DirectedGraph<GenericNode, GenericEdge> getGraph() {
         return this.graph;
     }
 
-    public MyFragment(Set<CapsuleEdge> capsuleEdges, Rule rule, DirectedGraph<Node, CapsuleEdge> graph) {
-        this.rule = rule;
+    public MyFragment(Set<GenericEdge> capsuleEdges, Resource model, DirectedGraph<GenericNode, GenericEdge> graph) {
+        this.model = model;
         this.graph = graph;
-        DirectedGraph<Node, CapsuleEdge> fragmentGraph = this.getMyFragmentAsGraph(capsuleEdges, graph);
-        Map<String, List<CapsuleEdge>> labelToOrderedCapsuleEdges = CanonicalLabelForFragmentCreator.getCanonicalLabel(fragmentGraph);
-        this.label = labelToOrderedCapsuleEdges.keySet().iterator().next();
-        this.orderedCapsuleEdges = labelToOrderedCapsuleEdges.get(this.label);
+        DirectedGraph<GenericNode, GenericEdge> fragmentGraph = this.getMyFragmentAsGraph(capsuleEdges, graph);
+        Map<String, List<GenericEdge>> labelToOrderedGenericEdges = CanonicalLabelFragmentCreator.getCanonicalLabel(fragmentGraph);
+        this.label = labelToOrderedGenericEdges.keySet().iterator().next();
+        this.orderedGenericEdges = labelToOrderedGenericEdges.get(this.label);
     }
 
-//    public boolean isSubMyFragment(MyFragment biggerMyFragment) {
-//        if (biggerMyFragment.orderedCapsuleEdges.size() < this.orderedCapsuleEdges.size()) {
-//        }
-//
-//        Iterator var2 = this.orderedCapsuleEdges.iterator();
-//
-//        CapsuleEdge e;
-//        do {
-//            if (!var2.hasNext()) {
-//                return true;
-//            }
-//
-//            e = (CapsuleEdge)var2.next();
-//        } while(biggerMyFragment.orderedCapsuleEdges.contains(e));
-//
-//        return false;
-//    }
+    public boolean isSubFragment(MyFragment biggerMyFragment) {
+        if (biggerMyFragment.orderedGenericEdges.size() < this.orderedGenericEdges.size()) {
+        }
 
-    public boolean isNodeOverlapping(MyFragment f) {
-        if (this.rule != f.getRule()) {
+        Iterator var2 = this.orderedGenericEdges.iterator();
+
+        GenericEdge e;
+        do {
+            if (!var2.hasNext()) {
+                return true;
+            }
+
+            e = (GenericEdge)var2.next();
+        } while(biggerMyFragment.orderedGenericEdges.contains(e));
+
+        return false;
+    }
+
+    public boolean isGenericNodeOverlapping(MyFragment f) {
+        if (this.model != f.getResource()) {
             return false;
         } else {
-            Set<Node> nodesThis = new HashSet<>();
-            Set<Node> nodesF = new HashSet<>();
-            DirectedGraph<Node, CapsuleEdge> graphF = f.getGraph();
+            Set<GenericNode> nodesThis = new HashSet<>();
+            Set<GenericNode> nodesF = new HashSet<>();
+            DirectedGraph<GenericNode, GenericEdge> graphF = f.getGraph();
 
-            for(CapsuleEdge e : this.orderedCapsuleEdges) {
+            for(GenericEdge e : this.orderedGenericEdges) {
                 nodesThis.add(this.graph.getEdgeSource(e));
                 nodesThis.add(this.graph.getEdgeTarget(e));
             }
 
-            for (CapsuleEdge e : f.orderedCapsuleEdges) {
+            for (GenericEdge e : f.orderedGenericEdges) {
                 nodesF.add(graphF.getEdgeSource(e));
                 nodesF.add(graphF.getEdgeTarget(e));
             }
 
-            Iterator<Node> var5 = nodesThis.iterator();
+            Iterator<GenericNode> var5 = nodesThis.iterator();
 
-            Node n;
+            GenericNode n;
             do {
                 if (!var5.hasNext()) {
                     return false;
@@ -173,14 +166,14 @@ public class MyFragment {
     }
 
     public boolean isGeneratingParent(MyFragment ckp1) {
-        if (ckp1.getRule() != this.rule) {
+        if (ckp1.getResource() != this.model) {
             return false;
         } else {
-            CapsuleEdge additionalEdge = null;
+            GenericEdge additionalEdge = null;
             boolean foundAdditionalEdge = false;
 
-            for (CapsuleEdge e : ckp1.orderedCapsuleEdges) {
-                if (!this.orderedCapsuleEdges.contains(e)) {
+            for (GenericEdge e : ckp1.orderedGenericEdges) {
+                if (!this.orderedGenericEdges.contains(e)) {
                     if (foundAdditionalEdge) {
                         return false;
                     }
@@ -190,34 +183,34 @@ public class MyFragment {
                 }
             }
 
-            return additionalEdge == ckp1.lastNotDisconnectingCapsuleEdge();
+            return additionalEdge == ckp1.lastNotDisconnectingGenericEdge();
         }
     }
 
-    private CapsuleEdge lastNotDisconnectingCapsuleEdge() {
-        if (this.lastNotDisconnectingCapsuleEdge != null) {
-            return this.lastNotDisconnectingCapsuleEdge;
+    private GenericEdge lastNotDisconnectingGenericEdge() {
+        if (this.lastNotDisconnectingGenericEdge != null) {
+            return this.lastNotDisconnectingGenericEdge;
         } else {
-            Iterator<CapsuleEdge> var1 = this.orderedCapsuleEdges.iterator();
+            Iterator<GenericEdge> var1 = this.orderedGenericEdges.iterator();
 
-            CapsuleEdge testEdge;
+            GenericEdge testEdge;
             do {
                 if (!var1.hasNext()) {
                     return null;
                 }
 
                 testEdge = var1.next();
-            } while(this.isTheOnlyConnectingCapsuleEdge(testEdge));
+            } while(this.isTheOnlyConnectingGenericEdge(testEdge));
 
-            this.lastNotDisconnectingCapsuleEdge = testEdge;
-            return this.lastNotDisconnectingCapsuleEdge;
+            this.lastNotDisconnectingGenericEdge = testEdge;
+            return this.lastNotDisconnectingGenericEdge;
         }
     }
 
-    private boolean isTheOnlyConnectingCapsuleEdge(CapsuleEdge e) {
-        Set<CapsuleEdge> capsuleEdgesWithoutE = new HashSet<>();
+    private boolean isTheOnlyConnectingGenericEdge(GenericEdge e) {
+        Set<GenericEdge> capsuleEdgesWithoutE = new HashSet<>();
 
-        for (CapsuleEdge edge : this.orderedCapsuleEdges) {
+        for (GenericEdge edge : this.orderedGenericEdges) {
             if (edge != e) {
                 capsuleEdgesWithoutE.add(edge);
             }
@@ -226,35 +219,35 @@ public class MyFragment {
         return !isConnected(capsuleEdgesWithoutE, this.graph);
     }
 
-    public static boolean isConnected(Set<CapsuleEdge> testCapsuleEdgeSet, DirectedGraph<Node, CapsuleEdge> graph) {
-        if (testCapsuleEdgeSet.size() == 1) {
+    public static boolean isConnected(Set<GenericEdge> testGenericEdgeSet, DirectedGraph<GenericNode, GenericEdge> graph) {
+        if (testGenericEdgeSet.size() == 1) {
             return true;
         } else {
-            Set<Node> nodes = new HashSet<>();
-            Set<CapsuleEdge> successfulTestedCapsuleEdges = new HashSet<>();
-            Iterator<CapsuleEdge> testcapsuleEdgesetIterator = testCapsuleEdgeSet.iterator();
+            Set<GenericNode> nodes = new HashSet<>();
+            Set<GenericEdge> successfulTestedGenericEdges = new HashSet<>();
+            Iterator<GenericEdge> testcapsuleEdgesetIterator = testGenericEdgeSet.iterator();
             if (testcapsuleEdgesetIterator.hasNext()) {
-                CapsuleEdge e = testcapsuleEdgesetIterator.next();
-                successfulTestedCapsuleEdges.add(e);
+                GenericEdge e = testcapsuleEdgesetIterator.next();
+                successfulTestedGenericEdges.add(e);
                 nodes.add(graph.getEdgeSource(e));
                 nodes.add(graph.getEdgeTarget(e));
             }
 
-            boolean foundSuccessfulTestedCapsuleEdges;
+            boolean foundSuccessfulTestedGenericEdges;
 
             label43:
             do {
-                if (testCapsuleEdgeSet.size() == successfulTestedCapsuleEdges.size()) {
+                if (testGenericEdgeSet.size() == successfulTestedGenericEdges.size()) {
                     return true;
                 }
 
-                foundSuccessfulTestedCapsuleEdges = false;
-                Iterator<CapsuleEdge> var6 = testCapsuleEdgeSet.iterator();
+                foundSuccessfulTestedGenericEdges = false;
+                Iterator<GenericEdge> var6 = testGenericEdgeSet.iterator();
 
                 while(true) {
-                    CapsuleEdge e;
-                    Node source;
-                    Node target;
+                    GenericEdge e;
+                    GenericNode source;
+                    GenericNode target;
                     do {
                         do {
                             if (!var6.hasNext()) {
@@ -262,7 +255,7 @@ public class MyFragment {
                             }
 
                             e = var6.next();
-                        } while(successfulTestedCapsuleEdges.contains(e));
+                        } while(successfulTestedGenericEdges.contains(e));
 
                         source = graph.getEdgeSource(e);
                         target = graph.getEdgeTarget(e);
@@ -270,10 +263,10 @@ public class MyFragment {
 
                     nodes.add(source);
                     nodes.add(target);
-                    successfulTestedCapsuleEdges.add(e);
-                    foundSuccessfulTestedCapsuleEdges = true;
+                    successfulTestedGenericEdges.add(e);
+                    foundSuccessfulTestedGenericEdges = true;
                 }
-            } while(foundSuccessfulTestedCapsuleEdges);
+            } while(foundSuccessfulTestedGenericEdges);
 
             return false;
         }
@@ -283,14 +276,14 @@ public class MyFragment {
         return this.label;
     }
 
-    public Set<MyFragment> extensOp(Set<CapsuleEdge> onlyThisCapsuleEdges) {
+    public Set<MyFragment> extensOp(Set<GenericEdge> onlyThisGenericEdges) {
         Set<MyFragment> res = new HashSet<>();
 
-        for (CapsuleEdge capsuleEdge : onlyThisCapsuleEdges) {
-            if (!this.orderedCapsuleEdges.contains(capsuleEdge) && this.graph.containsEdge(capsuleEdge) && this.isConnectedTo(capsuleEdge, this.orderedCapsuleEdges, this.graph)) {
-                Set<CapsuleEdge> tempCapsuleEdges = new HashSet<>(this.orderedCapsuleEdges);
-                tempCapsuleEdges.add(capsuleEdge);
-                MyFragment temp = new MyFragment(tempCapsuleEdges, this.rule, this.graph);
+        for (GenericEdge capsuleEdge : onlyThisGenericEdges) {
+            if (!this.orderedGenericEdges.contains(capsuleEdge) && this.graph.containsEdge(capsuleEdge) && this.isConnectedTo(capsuleEdge, this.orderedGenericEdges, this.graph)) {
+                Set<GenericEdge> tempGenericEdges = new HashSet<>(this.orderedGenericEdges);
+                tempGenericEdges.add(capsuleEdge);
+                MyFragment temp = new MyFragment(tempGenericEdges, this.model, this.graph);
                 res.add(temp);
             }
         }
@@ -298,28 +291,28 @@ public class MyFragment {
         return res;
     }
 
-    public MyFragment extensOp(CapsuleEdge capsuleEdge) {
-        if (!this.orderedCapsuleEdges.contains(capsuleEdge) && this.graph.containsEdge(capsuleEdge) && this.isConnectedTo(capsuleEdge, this.orderedCapsuleEdges, this.graph)) {
-            Set<CapsuleEdge> tempCapsuleEdges = new HashSet<>(this.orderedCapsuleEdges);
-            tempCapsuleEdges.add(capsuleEdge);
-            return new MyFragment(tempCapsuleEdges, this.rule, this.graph);
+    public MyFragment extensOp(GenericEdge capsuleEdge) {
+        if (!this.orderedGenericEdges.contains(capsuleEdge) && this.graph.containsEdge(capsuleEdge) && this.isConnectedTo(capsuleEdge, this.orderedGenericEdges, this.graph)) {
+            Set<GenericEdge> tempGenericEdges = new HashSet<>(this.orderedGenericEdges);
+            tempGenericEdges.add(capsuleEdge);
+            return new MyFragment(tempGenericEdges, this.model, this.graph);
         } else {
             return null;
         }
     }
 
-    private boolean isConnectedTo(CapsuleEdge e, List<CapsuleEdge> listCapsuleEdges, DirectedGraph<Node, CapsuleEdge> graph) {
-        if (!e.isAttributeEdge()) {
-            if (e.getOriginalEdge().getActionEdge().getGraph().getRule() != this.rule) {
-                return false;
-            }
-        } else if (e.getAttribute().getActionAttribute().getGraph().getRule() != this.rule) {
-            return false;
-        }
+    private boolean isConnectedTo(GenericEdge e, List<GenericEdge> listGenericEdges, DirectedGraph<GenericNode, GenericEdge> graph) {
+//        if (!e.isAttributeEdge()) {
+//            if (e.getOriginalEdge().getActionEdge().getGraph().getResource() != this.model) {
+//                return false;
+//            }
+//        } else if (e.getAttribute().getActionAttribute().getGraph().getResource() != this.model) {
+//            return false;
+//        }
 
-        Set<Node> nodes = new HashSet<>();
+        Set<GenericNode> nodes = new HashSet<>();
 
-        for (CapsuleEdge edge : listCapsuleEdges) {
+        for (GenericEdge edge : listGenericEdges) {
             nodes.add(graph.getEdgeSource(edge));
             nodes.add(graph.getEdgeTarget(edge));
         }
@@ -331,12 +324,12 @@ public class MyFragment {
         }
     }
 
-    private DirectedGraph<Node, CapsuleEdge> getMyFragmentAsGraph(Set<CapsuleEdge> capsuleEdges, DirectedGraph<Node, CapsuleEdge> graph) {
-        DirectedGraph<Node, CapsuleEdge> fragmentGraph = new DefaultDirectedGraph<>(CapsuleEdge.class);
+    private DirectedGraph<GenericNode, GenericEdge> getMyFragmentAsGraph(Set<GenericEdge> capsuleEdges, DirectedGraph<GenericNode, GenericEdge> graph) {
+        DirectedGraph<GenericNode, GenericEdge> fragmentGraph = new DefaultDirectedGraph<>(GenericEdge.class);
 
-        for (CapsuleEdge capsuleEdge : capsuleEdges) {
-            Node source = graph.getEdgeSource(capsuleEdge);
-            Node target = graph.getEdgeTarget(capsuleEdge);
+        for (GenericEdge capsuleEdge : capsuleEdges) {
+            GenericNode source = graph.getEdgeSource(capsuleEdge);
+            GenericNode target = graph.getEdgeTarget(capsuleEdge);
             fragmentGraph.addVertex(source);
             fragmentGraph.addVertex(target);
             fragmentGraph.addEdge(source, target, capsuleEdge);
