@@ -1,6 +1,6 @@
 package de.hub.mse.variantdrift.clone;
 
-import de.hub.mse.variantdrift.clone.detection.conqat.MyConqatBasedCloneDetector;
+import de.hub.mse.variantdrift.clone.conqat.MyConqatBasedCloneDetector;
 import de.hub.mse.variantdrift.clone.util.EdgeMapping;
 import de.hub.mse.variantdrift.clone.util.NodeMapping;
 import de.hub.mse.variantdrift.clone.models.GenericGraph;

@@ -1,4 +1,4 @@
-package de.hub.mse.variantdrift.clone.detection.conqat;
+package de.hub.mse.variantdrift.clone.conqat;
 
 import aatl.MatchedRule;
 import aatl.Module;
