@@ -19,27 +19,24 @@ public class MyEScanDetectionArticle extends MyEScanDetection {
     }
 
     public void detectCloneGroups() {
-        long startZeit = System.currentTimeMillis();
         Set<Set<Fragment>> cloneGroups = this.runEScan();
         this.resultAsCloneMatrix = CloneMatrixCreator.convertEScanResult(cloneGroups);
     }
 
     private Set<Set<Fragment>> runEScan() {
-        List<Set<Fragment>> lattice = new LinkedList();
+        List<Set<Fragment>> lattice = new LinkedList<>();
         Set<Fragment> all1Fragments = this.getL1Fragment();
         Set<Fragment> layer1 = this.clones1(all1Fragments);
         Set<CapsuleEdge> edgesLayer1 = this.extractEdges(layer1);
         lattice.add(layer1);
         int startLayer = 1;
-        Iterator var6 = ((Set)lattice.get(startLayer - 1)).iterator();
 
-        while(var6.hasNext()) {
-            Fragment f1 = (Fragment)var6.next();
-            this.discover(f1, this.clones(f1, (Set)lattice.get(startLayer - 1)), lattice, edgesLayer1, startLayer);
+        for (Object o : lattice.get(startLayer - 1)) {
+            Fragment f1 = (Fragment) o;
+            this.discover(f1, this.clones(f1, lattice.get(startLayer - 1)), lattice, edgesLayer1, startLayer);
         }
 
-        Set<Set<Fragment>> articleFilteredCG = this.eScanGroupAndFilterLattice(lattice);
-        return articleFilteredCG;
+        return this.eScanGroupAndFilterLattice(lattice);
     }
 
     private void discover(Fragment f, Collection<Fragment> fClones, List<Set<Fragment>> lattice, Set<CapsuleEdge> edgesLayer1, int kFromArticle) {
@@ -48,28 +45,23 @@ public class MyEScanDetectionArticle extends MyEScanDetection {
         }
 
         int k = kFromArticle - 1;
-        Set<Fragment> candidateSetCkp1 = new HashSet();
-        Iterator var8 = fClones.iterator();
+        Set<Fragment> candidateSetCkp1 = new HashSet<>();
 
-        while(var8.hasNext()) {
-            Fragment g = (Fragment)var8.next();
+        for (Fragment g : fClones) {
             Set<Fragment> extensOp = g.extensOp(edgesLayer1);
             candidateSetCkp1.addAll(extensOp);
         }
 
-        Iterator var13 = candidateSetCkp1.iterator();
-
-        while(var13.hasNext()) {
-            Fragment ckp1 = (Fragment)var13.next();
+        for (Fragment ckp1 : candidateSetCkp1) {
             if (f.isGeneratingParent(ckp1)) {
                 Set<Fragment> findClones = this.clones(ckp1, candidateSetCkp1);
                 if (findClones.size() > 1) {
                     if (lattice.size() <= k + 1) {
-                        Set<Fragment> newLayer = new HashSet();
+                        Set<Fragment> newLayer = new HashSet<>();
                         lattice.add(newLayer);
                     }
 
-                    ((Set)lattice.get(k + 1)).addAll(findClones);
+                    (lattice.get(k + 1)).addAll(findClones);
                     int kFromArticleNext = kFromArticle + 1;
                     this.discover(ckp1, findClones, lattice, edgesLayer1, kFromArticleNext);
                 }
