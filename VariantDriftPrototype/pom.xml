@@ -12,7 +12,7 @@
         <!-- Adjust your java version here -->
         <java.version>14</java.version>
 		<!-- Adjust the path to the class that contains the main-method, that is to be executed, here -->
-		<path.to.main>de.hub.mse.variantsync.variantdrift.experiments.ExperimentRunner</path.to.main>
+		<path.to.main>de.hub.mse.variantdrift.experiments.ExperimentRunner</path.to.main>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
