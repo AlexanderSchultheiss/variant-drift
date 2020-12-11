@@ -42,6 +42,7 @@ public class MyConqatBasedCloneDetector {
         result = new HashSet<>();
         for (ModelCloneReporterMock.ModelClone clone : reporter.modelClones) {
             // visualizeClone(clone);
+            // TODO: Fix result parsing
             List<Module> involvedModules = conqatManager.getInvolvedModules(clone);
             List<MatchedRule> involvedRules = conqatManager.getInvolvedMatchedRules(clone);
             Map<EObject, Set<EObject>> nodeMappings = conqatManager.createNodeMappings(clone);

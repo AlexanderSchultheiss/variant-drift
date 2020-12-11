@@ -1,11 +1,10 @@
 package de.hub.mse.variantdrift.clone;
 
 import de.hub.mse.variantdrift.clone.conqat.MyConqatBasedCloneDetector;
+import de.hub.mse.variantdrift.clone.escan.CombinedClone;
 import de.hub.mse.variantdrift.clone.escan.EScanDetectionOriginal;
-import de.hub.mse.variantdrift.clone.util.EdgeMapping;
-import de.hub.mse.variantdrift.clone.util.NodeMapping;
+import de.hub.mse.variantdrift.clone.util.*;
 import de.hub.mse.variantdrift.clone.models.GenericGraph;
-import de.hub.mse.variantdrift.clone.util.EMF2GenericGraph;
 import org.eclipse.emf.ecore.resource.Resource;
 
 import java.io.File;
@@ -71,7 +70,14 @@ public class PlayingAround {
         System.out.print("Starting EScan...");
         var escan = new EScanDetectionOriginal(filteredGraphs);
         escan.detectCloneGroups();
+//        GraphViewer.viewGraph(new GenericGraphToJGraph().transform(filteredGraphs.get(0)), "Model 1");
+//        GraphViewer.viewGraph(new GenericGraphToJGraph().transform(filteredGraphs.get(1)), "Model 2");
         var resultEScan = escan.getResultAsCloneMatrixOrderedByNumberOfCommonElements();
         System.out.println("EScan finished.");
+        var combinedClone = CombinedClone.fromEScanResult(resultEScan);
+
+        // Show the combined clones...
+        GraphViewer.viewGraph(new GenericGraphToJGraph().transform(combinedClone.get(modelGraphs.get(0))), "Model 1");
+        GraphViewer.viewGraph(new GenericGraphToJGraph().transform(combinedClone.get(modelGraphs.get(1))), "Model 2");
     }
 }

@@ -43,6 +43,7 @@ public class EMF2GenericGraph {
                 }
             }
             GenericNode node = new GenericNode(eObject.eClass().getName() + name);
+            node.setModel(graph);
 
             if (!nodeMapping.contains(eObject)) {
                 nodeMapping.put(eObject, node);

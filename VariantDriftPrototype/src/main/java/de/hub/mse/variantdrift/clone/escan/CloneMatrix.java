@@ -66,6 +66,10 @@ public class CloneMatrix {
         return edgeMatrix;
     }
 
+    public List<List<GenericNode>> getNodeMatrix() {
+        return nodeMatrix;
+    }
+
     public int getNumberOfCommonNodes() {
         return getAllNodes().size() / getRuleList().size();
     }

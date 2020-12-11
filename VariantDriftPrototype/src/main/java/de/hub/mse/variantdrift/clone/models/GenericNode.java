@@ -1,15 +1,12 @@
 package de.hub.mse.variantdrift.clone.models;
 
 import org.conqat.engine.model_clones.model.INode;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.uml2.uml.internal.impl.ClassImpl;
-import org.eclipse.uml2.uml.internal.impl.EnumerationImpl;
-import org.eclipse.uml2.uml.internal.impl.PackageImpl;
 
 import java.util.Objects;
 
 public class GenericNode implements INode {
     String label;
+    GenericGraph model;
 
     public GenericNode(String label) {
         this.label = Objects.requireNonNull(label);
@@ -27,4 +24,12 @@ public class GenericNode implements INode {
 
     @Override
     public String toString() {return label;}
+
+    public GenericGraph getModel() {
+        return model;
+    }
+
+    public void setModel(GenericGraph model) {
+        this.model = model;
+    }
 }

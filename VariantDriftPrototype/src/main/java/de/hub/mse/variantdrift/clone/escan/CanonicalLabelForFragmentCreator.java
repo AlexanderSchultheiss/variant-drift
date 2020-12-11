@@ -62,11 +62,9 @@ public class CanonicalLabelForFragmentCreator {
         StringBuilder stringBuilder = new StringBuilder();
         for (GenericEdge capsuleLink : orderedGenericEdges) {
             stringBuilder
-                    .append(LabelCreator.getModelCdEdgeLabel(capsuleLink,
-                            fragmentGraph, orderedGenericNodes.indexOf(fragmentGraph
-                                    .getEdgeSource(capsuleLink)), orderedGenericNodes
-                                    .indexOf(fragmentGraph
-                                            .getEdgeTarget(capsuleLink))));
+                    .append(LabelCreator.getModelCdEdgeLabel(capsuleLink, fragmentGraph,
+                            orderedGenericNodes.indexOf(fragmentGraph.getEdgeSource(capsuleLink)),
+                            orderedGenericNodes.indexOf(fragmentGraph.getEdgeTarget(capsuleLink))));
         }
         return stringBuilder.toString();
     }
