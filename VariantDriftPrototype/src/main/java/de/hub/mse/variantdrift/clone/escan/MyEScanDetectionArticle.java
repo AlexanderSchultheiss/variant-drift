@@ -2,7 +2,7 @@ package de.hub.mse.variantdrift.clone.escan;
 
 import de.hub.mse.variantdrift.clone.models.GenericEdge;
 import de.hub.mse.variantdrift.clone.models.GenericNode;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneMatrix;
+import de.uni_marburg.fb12.swt.cloneDetection.cloneDetection.CloneMatrix;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.jgrapht.DirectedGraph;
 
@@ -44,15 +44,10 @@ public class MyEScanDetectionArticle extends MyEScanDetection {
         List<List<GenericEdge>> edgeMatrix = new LinkedList<>();
 
         for (MyFragment myFragment : cloneGroup) {
-            List<GenericEdge> originalEdges = new LinkedList<>();
             List<GenericEdge> capsuleEdges = myFragment.getGenericEdges();
 
-            for (GenericEdge capsuleEdge : capsuleEdges) {
-                originalEdges.add(capsuleEdge.getOriginalEdge().getActionEdge());
-            }
-
-            attributeMatrix.add(attributes);
-            edgeMatrix.add(originalEdges);
+//            attributeMatrix.add(attributes);
+            edgeMatrix.add(new LinkedList<>(capsuleEdges));
         }
 
         CloneMatrix res = new CloneMatrix(edgeMatrix, attributeMatrix);
