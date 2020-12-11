@@ -1,6 +1,8 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import org.eclipse.emf.ecore.EObject;
+import de.hub.mse.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantdrift.clone.models.GenericGraph;
+import de.hub.mse.variantdrift.clone.models.GenericNode;
 
 import java.util.*;
 
@@ -16,12 +18,12 @@ public class CloneMatrixCreator {
 
 
 
-	private static List<List<CapsuleEdge>> getCapsuleEdgeMatrix(
+	private static List<List<GenericEdge>> getGenericEdgeMatrix(
 			Set<Fragment> cloneGroup) {
-		List<List<CapsuleEdge>> capsuleEdgeMatrix = new LinkedList<List<CapsuleEdge>>();
+		List<List<GenericEdge>> capsuleEdgeMatrix = new LinkedList<>();
 
 		for (Fragment fragment : cloneGroup) {
-			List<CapsuleEdge> capsuleEdges = fragment.getCapsuleEdges();
+			List<GenericEdge> capsuleEdges = fragment.getGenericEdges();
 			capsuleEdgeMatrix.add(capsuleEdges);
 		}
 
@@ -29,9 +31,9 @@ public class CloneMatrixCreator {
 	}
 
 
-	public static Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneMatrix> convertEScanResult(
+	public static Set<CloneMatrix> convertEScanResult(
 			Set<Set<Fragment>> setOfSetsOfSameCanonicalLabeledNonOverlappingFragments) {
-		Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneMatrix> res = new HashSet<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneMatrix>();
+		Set<CloneMatrix> res = new HashSet<>();
 
 		for (Set<Fragment> fragmentsCloneGroup 
 				: setOfSetsOfSameCanonicalLabeledNonOverlappingFragments) {
@@ -42,30 +44,26 @@ public class CloneMatrixCreator {
 		return res;
 	}
 
-	private static de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneMatrix convert(Set<Fragment> cloneGroup) {
+	private static CloneMatrix convert(Set<Fragment> cloneGroup) {
 
-		Set<MatchedRule> rules = new HashSet<MatchedRule>();
+		Set<GenericGraph> rules = new HashSet<>();
 		for (Fragment f : cloneGroup) {
 			rules.add(f.getModel());
 		}
 
-		List<List<Link>> edgeMatrix = new LinkedList<List<Link>>();
-		List<List<EObject>> nodeMatrix = new LinkedList<List<EObject>>();
+		List<List<GenericEdge>> edgeMatrix = new LinkedList<>();
+		List<List<GenericNode>> nodeMatrix = new LinkedList<>();
 
 		for (Fragment fragment : cloneGroup) {
-			List<Link> originalEdges = new LinkedList<Link>();
-			List<CapsuleEdge> capsuleEdges = fragment.getCapsuleEdges();
-			for (CapsuleEdge capsuleEdge : capsuleEdges) {
-					originalEdges.add(capsuleEdge.getOriginalEdge());
-			}
+			List<GenericEdge> capsuleEdges = fragment.getGenericEdges();
+			List<GenericEdge> originalEdges = new LinkedList<>(capsuleEdges);
 			edgeMatrix.add(originalEdges);
 
-			List<EObject> originalNodes = new ArrayList<EObject>(fragment.getNodes());
+			List<GenericNode> originalNodes = new ArrayList<>(fragment.getNodes());
 			nodeMatrix.add(originalNodes);
 		}
 
-		de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneMatrix res = new CloneMatrix(edgeMatrix, nodeMatrix);
-		return res;
+		return new CloneMatrix(edgeMatrix, nodeMatrix);
 	}
 //
 //	public static Set<CloneGroupMapping> convertEScanResultOld(
@@ -81,28 +79,28 @@ public class CloneMatrixCreator {
 //	}
 //
 //	private static CloneGroupMapping convertOld(Set<Fragment> cloneGroupFragment) {
-//		Set<MatchedRule> rules = new HashSet<MatchedRule>();
+//		Set<GenericGraph> rules = new HashSet<GenericGraph>();
 //		for (Fragment f : cloneGroupFragment) {
 //			rules.add(f.getRule());
 //		}
 //
 //		// Die Klassenfelder von CloneGroup
-//		Map<Edge, Map<MatchedRule, Edge>> edgeMappings = new HashMap<Edge, Map<MatchedRule, Edge>>();
-//		Map<Attribute, Map<MatchedRule, Attribute>> attributeMappings 
-//		= new HashMap<Attribute, Map<MatchedRule, Attribute>>();
+//		Map<Edge, Map<GenericGraph, Edge>> edgeMappings = new HashMap<Edge, Map<GenericGraph, Edge>>();
+//		Map<Attribute, Map<GenericGraph, Attribute>> attributeMappings
+//		= new HashMap<Attribute, Map<GenericGraph, Attribute>>();
 //
 //		for (Fragment f : cloneGroupFragment) {
-//			for (CapsuleEdge capsuleEdge : f.getCapsuleEdges()) {
-//				Map<MatchedRule, Edge> tempMapEdge = new HashMap<MatchedRule, Edge>();
-//				Map<MatchedRule, Attribute> tempMapAttribute = new HashMap<MatchedRule, Attribute>();
+//			for (GenericEdge capsuleEdge : f.getGenericEdges()) {
+//				Map<GenericGraph, Edge> tempMapEdge = new HashMap<GenericGraph, Edge>();
+//				Map<GenericGraph, Attribute> tempMapAttribute = new HashMap<GenericGraph, Attribute>();
 //
 //				if (capsuleEdge.isAttributeEdge()) {
 //					tempMapAttribute.put(f.getRule(),
 //							capsuleEdge.getAttribute());
 //					for (Fragment f2 : cloneGroupFragment) {
 //						if (!(f2 == f)) {
-//							for (CapsuleEdge capsuleEdge2 : f2
-//									.getCapsuleEdges()) {
+//							for (GenericEdge capsuleEdge2 : f2
+//									.getGenericEdges()) {
 //								if (capsuleEdge2.isAttributeEdge()) {
 //									if (capsuleEdge.getAttribute() == capsuleEdge2
 //											.getAttribute()) {
@@ -120,8 +118,8 @@ public class CloneMatrixCreator {
 //					tempMapEdge.put(f.getRule(), capsuleEdge.getOriginalEdge());
 //					for (Fragment f2 : cloneGroupFragment) {
 //						if (!(f2 == f)) {
-//							for (CapsuleEdge capsuleEdge2 : f2
-//									.getCapsuleEdges()) {
+//							for (GenericEdge capsuleEdge2 : f2
+//									.getGenericEdges()) {
 //								if (!capsuleEdge2.isAttributeEdge()) {
 //									if (capsuleEdge.getOriginalEdge() == capsuleEdge2
 //											.getOriginalEdge()) {
@@ -146,7 +144,7 @@ public class CloneMatrixCreator {
 //
 //	public static Set<CloneMatrix> convertClonePairSet(
 //			Collection<ClonePair> clonePairs,
-//			Map<MatchedRule, DirectedGraph<Node, CapsuleEdge>> ruleGraphMap) {
+//			Map<GenericGraph, DirectedGraph<Node, GenericEdge>> ruleGraphMap) {
 //		Set<CloneMatrix> res = new HashSet<CloneMatrix>();
 //		for (ClonePair clonePair : clonePairs) {
 //			CloneMatrix cloneMatrix = convertClonePair(clonePair, ruleGraphMap);
@@ -159,11 +157,11 @@ public class CloneMatrixCreator {
 //	}
 //
 //	private static CloneMatrix convertClonePair(ClonePair clonePair,
-//			Map<MatchedRule, DirectedGraph<Node, CapsuleEdge>> ruleGraphMap) {
-//		Set<MatchedRule> rules = new HashSet<MatchedRule>();
-//		MatchedRule rule1 = NodeUtility.getRule(clonePair.getNodePairs().iterator()
+//			Map<GenericGraph, DirectedGraph<Node, GenericEdge>> ruleGraphMap) {
+//		Set<GenericGraph> rules = new HashSet<GenericGraph>();
+//		GenericGraph rule1 = NodeUtility.getRule(clonePair.getNodePairs().iterator()
 //				.next().getNode1(), ruleGraphMap);
-//		MatchedRule rule2 = NodeUtility.getRule(clonePair.getNodePairs().iterator()
+//		GenericGraph rule2 = NodeUtility.getRule(clonePair.getNodePairs().iterator()
 //				.next().getNode2(), ruleGraphMap);
 //		rules.add(rule1);
 //		rules.add(rule2);
@@ -173,7 +171,7 @@ public class CloneMatrixCreator {
 //
 //		List<Edge> originalEdges1 = new LinkedList<Edge>();
 //		List<Attribute> attributes1 = new LinkedList<Attribute>();
-//		for (CapsuleEdge capsuleEdge : clonePair.getCapsuleEdges1()) {
+//		for (GenericEdge capsuleEdge : clonePair.getGenericEdges1()) {
 //			if (capsuleEdge.isAttributeEdge()) {
 //				attributes1
 //						.add(capsuleEdge.getAttribute().getActionAttribute());
@@ -187,7 +185,7 @@ public class CloneMatrixCreator {
 //
 //		List<Edge> originalEdges2 = new LinkedList<Edge>();
 //		List<Attribute> attributes2 = new LinkedList<Attribute>();
-//		for (CapsuleEdge capsuleEdge : clonePair.getCapsuleEdges2()) {
+//		for (GenericEdge capsuleEdge : clonePair.getGenericEdges2()) {
 //			if (capsuleEdge.isAttributeEdge()) {
 //				attributes2
 //						.add(capsuleEdge.getAttribute().getActionAttribute());
@@ -204,7 +202,7 @@ public class CloneMatrixCreator {
 //
 //	public static Set<CloneMatrix> convertCloneTupelSet(
 //			Collection<CloneTupel> cloneTupels,
-//			Map<MatchedRule, DirectedGraph<Node, CapsuleEdge>> ruleGraphMap) {
+//			Map<GenericGraph, DirectedGraph<Node, GenericEdge>> ruleGraphMap) {
 //		Set<CloneMatrix> res = new HashSet<CloneMatrix>();
 //		for (CloneTupel cloneTupel : cloneTupels) {
 //			CloneMatrix cloneMatrix = convertCloneTupel(cloneTupel,
@@ -218,13 +216,13 @@ public class CloneMatrixCreator {
 //	}
 //
 //	private static CloneMatrix convertCloneTupel(CloneTupel cloneTupel,
-//			Map<MatchedRule, DirectedGraph<Node, CapsuleEdge>> ruleGraphMap) {
+//			Map<GenericGraph, DirectedGraph<Node, GenericEdge>> ruleGraphMap) {
 //
-//		List<MatchedRule> ruleList = new LinkedList<MatchedRule>();
-//		Set<MatchedRule> rules = new HashSet<MatchedRule>();
+//		List<GenericGraph> ruleList = new LinkedList<GenericGraph>();
+//		Set<GenericGraph> rules = new HashSet<GenericGraph>();
 //		NodeTupel nodeTupel = cloneTupel.getNodeTupels().iterator().next();
 //		for (Node node : nodeTupel.getNodeTupelAsNodeList()) {
-//			MatchedRule rule = NodeUtility.getRule(node, ruleGraphMap);
+//			GenericGraph rule = NodeUtility.getRule(node, ruleGraphMap);
 //			rules.add(rule);
 //			ruleList.add(rule);
 //		}
@@ -232,10 +230,10 @@ public class CloneMatrixCreator {
 //		List<List<Edge>> edgeMatrix = new LinkedList<List<Edge>>();
 //		List<List<Attribute>> attributeMatrix = new LinkedList<List<Attribute>>();
 //
-//		for (List<CapsuleEdge> capsuleEdges : cloneTupel.getCapsuleEdges()) {
+//		for (List<GenericEdge> capsuleEdges : cloneTupel.getGenericEdges()) {
 //			List<Edge> originalEdges1 = new LinkedList<Edge>();
 //			List<Attribute> attributes1 = new LinkedList<Attribute>();
-//			for (CapsuleEdge capsuleEdge : capsuleEdges) {
+//			for (GenericEdge capsuleEdge : capsuleEdges) {
 //				if (capsuleEdge.isAttributeEdge()) {
 //					attributes1.add(capsuleEdge.getAttribute()
 //							.getActionAttribute());

@@ -3,32 +3,24 @@ package de.hub.mse.variantdrift.clone.models;
 import org.conqat.engine.model_clones.model.IDirectedEdge;
 import org.conqat.engine.model_clones.model.IModelGraph;
 import org.conqat.engine.model_clones.model.INode;
-import org.eclipse.emf.ecore.resource.Resource;
 
 import java.util.*;
 
 public class GenericGraph implements IModelGraph {
-    private final Resource model;
     private final Set<INode> nodes;
     private final Set<IDirectedEdge> edges;
     private final String label;
 
-    public GenericGraph(String label, Resource model) {
-        this.model = model;
+    public GenericGraph(String label) {
         this.nodes = new HashSet<>();
         this.edges = new HashSet<>();
         this.label = label;
     }
 
-    public GenericGraph(String label, Resource model, Set<INode> nodes, Set<IDirectedEdge> edges) {
-        this.model = model;
+    public GenericGraph(String label, Set<INode> nodes, Set<IDirectedEdge> edges) {
         this.label = label;
                 this.edges = Objects.requireNonNull(edges);
         this.nodes = Objects.requireNonNull(nodes);
-    }
-
-    public Resource getModel() {
-        return model;
     }
 
     @Override
@@ -58,7 +50,7 @@ public class GenericGraph implements IModelGraph {
             combinedNodes.addAll(g.nodes);
             combinedEdges.addAll(g.edges);
         });
-        return new GenericGraph(label, null, combinedNodes, combinedEdges);
+        return new GenericGraph(label, combinedNodes, combinedEdges);
     }
 
     public GenericGraph simulateSmallerGraph() {
@@ -83,7 +75,7 @@ public class GenericGraph implements IModelGraph {
                 edges.add(edge);
             }
         }
-        return new GenericGraph(label, model, nodes, edges);
+        return new GenericGraph(label, nodes, edges);
     }
 
     public String getLabel() {

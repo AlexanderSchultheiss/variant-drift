@@ -1,22 +1,20 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import org.eclipse.emf.ecore.EObject;
+import de.hub.mse.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantdrift.clone.models.GenericGraph;
+import de.hub.mse.variantdrift.clone.models.GenericNode;
 import org.jgrapht.DirectedGraph;
 
 import java.util.*;
 
 public class EScanDetectionOriginal extends EScanDetection {
-	public EScanDetectionOriginal(List<MatchedRule> rules) {
+	public EScanDetectionOriginal(List<GenericGraph> rules) {
 		super(rules);
-	}
-	
-	public EScanDetectionOriginal(Set<Module> modules) {
-		super(modules);
 	}
 
 	public EScanDetectionOriginal(
-			Map<MatchedRule, DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge>> ruleGraphMap,
-			List<MatchedRule> ruleList) {
+			Map<GenericGraph, DirectedGraph<GenericNode, GenericEdge>> ruleGraphMap,
+			List<GenericGraph> ruleList) {
 		super(ruleGraphMap, ruleList);
 	}
 
@@ -26,7 +24,7 @@ public class EScanDetectionOriginal extends EScanDetection {
 		if (DEBUG) System.out
 				.println(startDetectCloneGroups("EScanDetectionArticleOriginal"));
 
-		Set<Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment>> cloneGroups = runEScan();
+		Set<Set<Fragment>> cloneGroups = runEScan();
 
 		if (DEBUG) System.out.println(startConversion());
 
@@ -44,22 +42,21 @@ public class EScanDetectionOriginal extends EScanDetection {
 	 * 
 	 * @return the found cloneGroups
 	 */
-	private Set<Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment>> runEScan() {
-		List<Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment>> lattice = new LinkedList<Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment>>();
-		Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment> all1Fragments = getL1Fragment();
-		Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment> layer1 = clones1(all1Fragments);
-		Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> edgesLayer1 = extractEdges(layer1);
+	private Set<Set<Fragment>> runEScan() {
+		List<Set<Fragment>> lattice = new LinkedList<>();
+		Set<Fragment> all1Fragments = getL1Fragment();
+		Set<Fragment> layer1 = clones1(all1Fragments);
+		Set<GenericEdge> edgesLayer1 = extractEdges(layer1);
 
 		lattice.add(layer1);
-		int startLayer = 1;
+		int startLayer = 0;
 
 		// line 3
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment f1 : lattice.get(startLayer - 1)) {
-			discover(f1, clones(f1, lattice.get(startLayer - 1)), lattice,
+		for (Fragment f1 : lattice.get(startLayer)) {
+			discover(f1, clones(f1, lattice.get(startLayer)), lattice,
 					edgesLayer1, startLayer);
 		}
-		Set<Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment>> articleFilteredCG = eScanGroupAndFilterLattice(lattice);
-		return articleFilteredCG;
+		return eScanGroupAndFilterLattice(lattice);
 	}
 
 	/**
@@ -86,8 +83,8 @@ public class EScanDetectionOriginal extends EScanDetection {
 	 *            decreased by 1 and Fragments of size 2 will be stored at index
 	 *            1,
 	 */
-	private void discover(de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment f, Collection<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment> fClones,
-                          List<Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment>> lattice, Set<CapsuleEdge> edgesLayer1,
+	private void discover(Fragment f, Collection<Fragment> fClones,
+                          List<Set<Fragment>> lattice, Set<GenericEdge> edgesLayer1,
                           int kFromArticle) {
 
 		if (fClones.size() <= 1) {
@@ -100,16 +97,16 @@ public class EScanDetectionOriginal extends EScanDetection {
 		// a decreased version, k, of kFromArticle will be used instead
 		int k = kFromArticle - 1;
 
-		Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment> candidateSetCkp1 = new HashSet<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment>();
+		Set<Fragment> candidateSetCkp1 = new HashSet<>();
 		// line 9 + 10
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment g : fClones) {
-			Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment> extensOp = g.extensOp(edgesLayer1);
+		for (Fragment g : fClones) {
+			Set<Fragment> extensOp = g.extensOp(edgesLayer1);
 			candidateSetCkp1.addAll(extensOp);
 		}
 
-		Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment> findClones;
+		Set<Fragment> findClones;
 		// line 11
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment ckp1 : candidateSetCkp1) {
+		for (Fragment ckp1 : candidateSetCkp1) {
 			// line 12
 			if (f.isGeneratingParent(ckp1)) {
 				// line 13
@@ -117,7 +114,7 @@ public class EScanDetectionOriginal extends EScanDetection {
 				// line 14
 				if ((findClones.size() > 1)) {
 					if (lattice.size() <= k + 1) {
-						Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment> newLayer = new HashSet<Fragment>();
+						Set<Fragment> newLayer = new HashSet<>();
 						lattice.add(newLayer);
 					}
 					// line 15

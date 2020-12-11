@@ -3,7 +3,6 @@ package de.hub.mse.variantdrift.clone.escan;
 import de.hub.mse.variantdrift.clone.models.GenericEdge;
 import de.hub.mse.variantdrift.clone.models.GenericGraph;
 import de.hub.mse.variantdrift.clone.models.GenericNode;
-import de.hub.mse.variantdrift.clone.util.EReferenceInstance;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
@@ -76,7 +75,7 @@ public class Fragment {
 	 * 
 	 * @return all the CapsuleEdges this Fragment exist of
 	 */
-	public List<GenericEdge> getCapsuleEdges() {
+	public List<GenericEdge> getGenericEdges() {
 		return orderedCapsuleEdges;
 	}
 
@@ -96,12 +95,8 @@ public class Fragment {
 	 * 
 	 * @return all original edges (that is Henhsin-edges) of this Fragment
 	 */
-	public Set<EReferenceInstance> getOriginalEdges() {
-		Set<EReferenceInstance> res = new HashSet<>();
-		for (GenericEdge e : orderedCapsuleEdges) {
-				res.add(e.getOriginalReference());
-		}
-		return res;
+	public Set<GenericEdge> getOriginalEdges() {
+		return new HashSet<>(orderedCapsuleEdges);
 	}
 
 
@@ -345,7 +340,7 @@ public class Fragment {
                                   List<GenericEdge> listCapsuleEdges,
                                   DirectedGraph<GenericNode, GenericEdge> graph) {
 		
-			if (e.getOriginalReference().model != model.getModel()) {
+			if (e.getModel() != model) {
 				return false;
 			}
 		

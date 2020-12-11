@@ -1,6 +1,7 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import org.eclipse.emf.ecore.EObject;
+import de.hub.mse.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantdrift.clone.models.GenericNode;
 import org.jgrapht.DirectedGraph;
 
 import java.util.*;
@@ -12,176 +13,167 @@ public class CanonicalLabelForFragmentCreator {
 	 */
 	public static final String SEPARATOR = LabelCreator.getSeparator();
 
-	private static Map<String, List<CapsuleEdge>> getCanonicalLabels(
-			DirectedGraph<EObject, CapsuleEdge> fragmentGraph) {
-		Map<String, List<CapsuleEdge>> labelsToOrderedCapsuleEdges 
-				= new HashMap<String, List<CapsuleEdge>>();
+	private static Map<String, List<GenericEdge>> getCanonicalLabels(
+			DirectedGraph<GenericNode, GenericEdge> fragmentGraph) {
+		Map<String, List<GenericEdge>> labelsToOrderedGenericEdges
+				= new HashMap<>();
 
-		List<List<EObject>> nodeSequences = getEObjectSequences(fragmentGraph);
+		List<List<GenericNode>> nodeSequences = getGenericNodeSequences(fragmentGraph);
 
 		if (nodeSequences.isEmpty()) {
 			System.out
 					.println("CanonicalLabelForFragmenCreator -"
 							+ " getCanonicalLabels: empty nodeSequence");
 		}
-		for (List<EObject> nodeSequence : nodeSequences) {
-			List<CapsuleEdge> orderedCapsuleEdges = getOrderedCapsuleEdges(
+		for (List<GenericNode> nodeSequence : nodeSequences) {
+			List<GenericEdge> orderedGenericEdges = getOrderedGenericEdges(
 					fragmentGraph, nodeSequence);
-			labelsToOrderedCapsuleEdges.put(
+			labelsToOrderedGenericEdges.put(
 					getCanonicalLabel(fragmentGraph, nodeSequence,
-							orderedCapsuleEdges), orderedCapsuleEdges);
+							orderedGenericEdges), orderedGenericEdges);
 		}
 
-		return labelsToOrderedCapsuleEdges;
+		return labelsToOrderedGenericEdges;
 	}
 
 	/**
 	 * in case there are more than one possible label, the smallest one is
 	 * chosen (occurs when a perfect refining of the nodeSequenzes is not found)
-	 * 
-	 * @param f
-	 * @param ruleGraphMap
-	 * @return
+	 *
 	 */
 
-	public static Map<String, List<CapsuleEdge>> getCanonicalLabel(
-			DirectedGraph<EObject, CapsuleEdge> fragmentGraph) {
-		Map<String, List<CapsuleEdge>> res = new HashMap<String, List<CapsuleEdge>>();
-		Map<String, List<CapsuleEdge>> labelsToOrderedCapsuleEdges 
+	public static Map<String, List<GenericEdge>> getCanonicalLabel(
+			DirectedGraph<GenericNode, GenericEdge> fragmentGraph) {
+		Map<String, List<GenericEdge>> res = new HashMap<>();
+		Map<String, List<GenericEdge>> labelsToOrderedGenericEdges
 						= getCanonicalLabels(fragmentGraph);
 
-		Set<String> labelsSet = labelsToOrderedCapsuleEdges.keySet();
-		List<String> labels = new LinkedList<String>();
-		labels.addAll(labelsSet);
+		Set<String> labelsSet = labelsToOrderedGenericEdges.keySet();
+		List<String> labels = new LinkedList<>(labelsSet);
 		Collections.sort(labels);
 
 		String label = labels.get(0);
-		res.put(label, labelsToOrderedCapsuleEdges.get(label));
+		res.put(label, labelsToOrderedGenericEdges.get(label));
 		return res;
 	}
 
 	private static String getCanonicalLabel(
-			DirectedGraph<EObject, CapsuleEdge> fragmentGraph,
-			List<EObject> orderedEObjects, List<CapsuleEdge> orderedCapsuleEdges) {
+			DirectedGraph<GenericNode, GenericEdge> fragmentGraph,
+			List<GenericNode> orderedGenericNodes, List<GenericEdge> orderedGenericEdges) {
 		StringBuilder stringBuilder = new StringBuilder();
-		for (CapsuleEdge capsuleLink : orderedCapsuleEdges) {
+		for (GenericEdge capsuleLink : orderedGenericEdges) {
 			stringBuilder
 					.append(LabelCreator.getModelCdEdgeLabel(capsuleLink,
-							fragmentGraph, orderedEObjects.indexOf(fragmentGraph
-									.getEdgeSource(capsuleLink)), orderedEObjects
+							fragmentGraph, orderedGenericNodes.indexOf(fragmentGraph
+									.getEdgeSource(capsuleLink)), orderedGenericNodes
 									.indexOf(fragmentGraph
 											.getEdgeTarget(capsuleLink))));
 		}
 		return stringBuilder.toString();
 	}
 
-	private static List<CapsuleEdge> getOrderedCapsuleEdges(
-			DirectedGraph<EObject, CapsuleEdge> fragmentGraph,
-			List<EObject> orderedEObjects) {
-		List<CapsuleEdge> orderedCapsuleEdges = new LinkedList<CapsuleEdge>();
-		for (EObject node : orderedEObjects) {
-			Set<EObject> nodesIn = new HashSet<EObject>();
-			Set<CapsuleEdge> ceIn = fragmentGraph.incomingEdgesOf(node);
-			for (CapsuleEdge ce : ceIn) {
-				EObject source = fragmentGraph.getEdgeSource(ce);
+	private static List<GenericEdge> getOrderedGenericEdges(
+			DirectedGraph<GenericNode, GenericEdge> fragmentGraph,
+			List<GenericNode> orderedGenericNodes) {
+		List<GenericEdge> orderedGenericEdges = new LinkedList<>();
+		for (GenericNode node : orderedGenericNodes) {
+			Set<GenericNode> nodesIn = new HashSet<>();
+			Set<GenericEdge> ceIn = fragmentGraph.incomingEdgesOf(node);
+			for (GenericEdge ce : ceIn) {
+				GenericNode source = fragmentGraph.getEdgeSource(ce);
 				nodesIn.add(source);
 			}
 
 			// put nodesIn in order
-			List<Integer> positions = new LinkedList<Integer>();
-			for (EObject nIn : nodesIn) {
-				int position = orderedEObjects.indexOf(nIn);
+			List<Integer> positions = new LinkedList<>();
+			for (GenericNode nIn : nodesIn) {
+				int position = orderedGenericNodes.indexOf(nIn);
 				if (position >= 0) {
-					positions.add(orderedEObjects.indexOf(nIn));
+					positions.add(orderedGenericNodes.indexOf(nIn));
 				}
 			}
 			Collections.sort(positions);
 
 			for (Integer position : positions) {
-				EObject n = orderedEObjects.get(position);
-				orderedCapsuleEdges.add(fragmentGraph.getEdge(n, node));
+				GenericNode n = orderedGenericNodes.get(position);
+				orderedGenericEdges.add(fragmentGraph.getEdge(n, node));
 			}
 
 		}
-		return orderedCapsuleEdges;
+		return orderedGenericEdges;
 	}
 
 	/**
-	 * 
-	 * @param fragmentGraph
-	 * @return List of possible EObjectSequences a EObjectSequenzes is a List of EObjects
+	 * @return List of possible GenericNodeSequences a GenericNodeSequenzes is a List of GenericNodes
 	 *         if a perfect Partitioning could be achieved the List of possible
-	 *         EObjectSequences contains only one EObjectSequence
+	 *         GenericNodeSequences contains only one GenericNodeSequence
 	 */
 
-	private static List<List<EObject>> getEObjectSequences(
-			DirectedGraph<EObject, CapsuleEdge> fragmentGraph) {
-		// create Partitioning based on EObjectLabels
-		Map<String, Set<EObject>> nodeLabelsToEObjects = new HashMap<String, Set<EObject>>();
+	private static List<List<GenericNode>> getGenericNodeSequences(
+			DirectedGraph<GenericNode, GenericEdge> fragmentGraph) {
+		// create Partitioning based on GenericNodeLabels
+		Map<String, Set<GenericNode>> nodeLabelsToGenericNodes = new HashMap<>();
 		boolean isPerfect = true;
-		for (EObject node : fragmentGraph.vertexSet()) {
+		for (GenericNode node : fragmentGraph.vertexSet()) {
 			String label = LabelCreator
-					.getModelCdNodeLabel(node, fragmentGraph);
-			if (nodeLabelsToEObjects.containsKey(label)) {
-				nodeLabelsToEObjects.get(label).add(node);
+					.getModelCdNodeLabel(node);
+			if (nodeLabelsToGenericNodes.containsKey(label)) {
+				nodeLabelsToGenericNodes.get(label).add(node);
 				isPerfect = false;
 			} else {
-				HashSet<EObject> hashSet = new HashSet<EObject>();
+				HashSet<GenericNode> hashSet = new HashSet<>();
 				hashSet.add(node);
-				nodeLabelsToEObjects.put(label, hashSet);
+				nodeLabelsToGenericNodes.put(label, hashSet);
 			}
 		}
 		if (isPerfect) {
-			List<EObject> nodeSequenz = getEObjectSequenzesSimpel(nodeLabelsToEObjects);
-			List<List<EObject>> res = new LinkedList<List<EObject>>();
+			List<GenericNode> nodeSequenz = getGenericNodeSequenzesSimpel(nodeLabelsToGenericNodes);
+			List<List<GenericNode>> res = new LinkedList<>();
 			res.add(nodeSequenz);
 			return res;
 		}
 
 		// refine Partitioning
-		Map<String, Set<EObject>> extendedEObjectLabelsToEObjects = getRefineEObjectPartitioning(
-				nodeLabelsToEObjects, fragmentGraph);
+		Map<String, Set<GenericNode>> extendedGenericNodeLabelsToGenericNodes = getRefineGenericNodePartitioning(
+				nodeLabelsToGenericNodes, fragmentGraph);
 
-		if (isPerfectPartitioning(extendedEObjectLabelsToEObjects, fragmentGraph)) {
-			List<EObject> nodeSequenz = getEObjectSequenzesSimpel(extendedEObjectLabelsToEObjects);
-			List<List<EObject>> res = new LinkedList<List<EObject>>();
+		if (isPerfectPartitioning(extendedGenericNodeLabelsToGenericNodes, fragmentGraph)) {
+			List<GenericNode> nodeSequenz = getGenericNodeSequenzesSimpel(extendedGenericNodeLabelsToGenericNodes);
+			List<List<GenericNode>> res = new LinkedList<>();
 			res.add(nodeSequenz);
 			return res;
 		}
 
-		return getEObjectSequenzes(extendedEObjectLabelsToEObjects);
+		return getGenericNodeSequenzes(extendedGenericNodeLabelsToGenericNodes);
 	}
 
-	private static Map<String, Set<EObject>> getRefineEObjectPartitioning(
-			Map<String, Set<EObject>> nodeLabelsToEObjects,
-			DirectedGraph<EObject, CapsuleEdge> fragmentGraph) {
-		Map<String, Set<EObject>> extendedEObjectLabelsToEObjects = new HashMap<String, Set<EObject>>();
+	private static Map<String, Set<GenericNode>> getRefineGenericNodePartitioning(
+			Map<String, Set<GenericNode>> nodeLabelsToGenericNodes,
+			DirectedGraph<GenericNode, GenericEdge> fragmentGraph) {
+		Map<String, Set<GenericNode>> extendedGenericNodeLabelsToGenericNodes = new HashMap<>();
 
-		for (String s : nodeLabelsToEObjects.keySet()) {
-			if (nodeLabelsToEObjects.get(s).size() == 1) {
-				extendedEObjectLabelsToEObjects.put(s, nodeLabelsToEObjects.get(s));
+		for (String s : nodeLabelsToGenericNodes.keySet()) {
+			if (nodeLabelsToGenericNodes.get(s).size() == 1) {
+				extendedGenericNodeLabelsToGenericNodes.put(s, nodeLabelsToGenericNodes.get(s));
 			} else {
-				extendedEObjectLabelsToEObjects.putAll(getRefinedEObjectSet(s,
-						nodeLabelsToEObjects.get(s), fragmentGraph));
+				extendedGenericNodeLabelsToGenericNodes.putAll(getRefinedGenericNodeSet(s,
+						nodeLabelsToGenericNodes.get(s), fragmentGraph));
 			}
 		}
-		return extendedEObjectLabelsToEObjects;
+		return extendedGenericNodeLabelsToGenericNodes;
 	}
 
 	/**
 	 * refine nodeset based on the incoming and outgoing edges
-	 * 
-	 * @param label
-	 * @param nodes
-	 * @return
+	 *
 	 */
-	private static Map<String, Set<EObject>> getRefinedEObjectSet(String label,
-			Set<EObject> nodes, DirectedGraph<EObject, CapsuleEdge> fragmentGraph) {
-		Map<String, Set<EObject>> tempRes = new HashMap<String, Set<EObject>>();
-		Map<EObject, String> nodesToTempLabel = new HashMap<EObject, String>();
+	private static Map<String, Set<GenericNode>> getRefinedGenericNodeSet(String label,
+			Set<GenericNode> nodes, DirectedGraph<GenericNode, GenericEdge> fragmentGraph) {
+		Map<String, Set<GenericNode>> tempRes = new HashMap<>();
+		Map<GenericNode, String> nodesToTempLabel = new HashMap<>();
 		// incomingLinks
 		boolean isPerfect = true;
-		for (EObject node : nodes) {
+		for (GenericNode node : nodes) {
 			String newLabel = label + SEPARATOR
 					+ fragmentGraph.incomingEdgesOf(node).size();
 			if (tempRes.containsKey(newLabel)) {
@@ -189,7 +181,7 @@ public class CanonicalLabelForFragmentCreator {
 				nodesToTempLabel.put(node, newLabel);
 				isPerfect = false;
 			} else {
-				Set<EObject> set = new HashSet<EObject>();
+				Set<GenericNode> set = new HashSet<>();
 				set.add(node);
 				tempRes.put(newLabel, set);
 				nodesToTempLabel.put(node, newLabel);
@@ -200,15 +192,15 @@ public class CanonicalLabelForFragmentCreator {
 			return tempRes;
 		}
 
-		Map<String, Set<EObject>> res = new HashMap<String, Set<EObject>>();
+		Map<String, Set<GenericNode>> res = new HashMap<>();
 		// outgoingLinks
-		for (EObject node : nodes) {
+		for (GenericNode node : nodes) {
 			String newLabel = nodesToTempLabel.get(node) + SEPARATOR
 					+ fragmentGraph.outgoingEdgesOf(node).size();
 			if (res.containsKey(newLabel)) {
 				res.get(newLabel).add(node);
 			} else {
-				Set<EObject> set = new HashSet<EObject>();
+				Set<GenericNode> set = new HashSet<>();
 				set.add(node);
 				res.put(newLabel, set);
 			}
@@ -217,74 +209,68 @@ public class CanonicalLabelForFragmentCreator {
 	}
 
 	private static boolean isPerfectPartitioning(
-			Map<String, Set<EObject>> nodeLabelsToEObjects,
-			DirectedGraph<EObject, CapsuleEdge> fragmentGraph) {
-		if (nodeLabelsToEObjects.size() == fragmentGraph.vertexSet().size()) {
-			return true;
-		} else {
-			return false;
-		}
+			Map<String, Set<GenericNode>> nodeLabelsToGenericNodes,
+			DirectedGraph<GenericNode, GenericEdge> fragmentGraph) {
+		return nodeLabelsToGenericNodes.size() == fragmentGraph.vertexSet().size();
 
 	}
 
-	private static List<EObject> getEObjectSequenzesSimpel(
-			Map<String, Set<EObject>> nodeLabelsToEObjects) {
-		List<EObject> res = new LinkedList<EObject>();
-		List<String> labels = new LinkedList<String>();
-		labels.addAll(nodeLabelsToEObjects.keySet());
+	private static List<GenericNode> getGenericNodeSequenzesSimpel(
+			Map<String, Set<GenericNode>> nodeLabelsToGenericNodes) {
+		List<GenericNode> res = new LinkedList<>();
+		List<String> labels = new LinkedList<>(nodeLabelsToGenericNodes.keySet());
 		Collections.sort(labels);
 		for (String label : labels) {
-			if (nodeLabelsToEObjects.get(label).size() != 1) {
+			if (nodeLabelsToGenericNodes.get(label).size() != 1) {
 				System.out
-						.println("CanonicalLabelForFragmenCreator - getEObjectSequenzesSimpel: ????");
+						.println("CanonicalLabelForFragmenCreator - getGenericNodeSequenzesSimpel: ????");
 			}
-			res.add(nodeLabelsToEObjects.get(label).iterator().next());
+			res.add(nodeLabelsToGenericNodes.get(label).iterator().next());
 		}
 		return res;
 	}
 
-	private static List<List<EObject>> getEObjectSequenzes(
-			Map<String, Set<EObject>> nodeLabelsToEObjects) {
+	private static List<List<GenericNode>> getGenericNodeSequenzes(
+			Map<String, Set<GenericNode>> nodeLabelsToGenericNodes) {
 		int positionLastDuplicate = -1;
 
-		List<String> labels = new LinkedList<String>();
-		labels.addAll(nodeLabelsToEObjects.keySet());
+		List<String> labels = new LinkedList<>(nodeLabelsToGenericNodes.keySet());
 		Collections.sort(labels);
 		int position = -1;
 		for (String label : labels) {
 			position++;
-			if (nodeLabelsToEObjects.get(label).size() != 1) {
+			if (nodeLabelsToGenericNodes.get(label).size() != 1) {
 				positionLastDuplicate = position;
 			}
 		}
 
-		List<EObject> endTail = new LinkedList<EObject>();
+		List<GenericNode> endTail = new LinkedList<>();
 		for (int i = positionLastDuplicate + 1; i < labels.size(); i++) {
-			// beyond the last duplicate there is only one EObject per set
-			EObject insertEObject = nodeLabelsToEObjects.get(labels.get(i)).iterator()
+			// beyond the last duplicate there is only one GenericNode per set
+			GenericNode insertGenericNode = nodeLabelsToGenericNodes.get(labels.get(i)).iterator()
 					.next();
-			endTail.add(insertEObject);
+			endTail.add(insertGenericNode);
 		}
 
 		if (positionLastDuplicate == -1) {
-			List<List<EObject>> res = new LinkedList<List<EObject>>();
+			List<List<GenericNode>> res = new LinkedList<>();
 			res.add(endTail);
 			return res;
 		}
 
-		List<List<EObject>> tails = getAllPermutations(nodeLabelsToEObjects
+		List<List<GenericNode>> tails = getAllPermutations(nodeLabelsToGenericNodes
 				.get(labels.get(0)));
 
 		List<String> remainingLabels = labels.subList(1,
 				positionLastDuplicate + 1);
 
 		for (String label : remainingLabels) {
-			List<List<EObject>> newTails = new LinkedList<List<EObject>>();
-			List<List<EObject>> intermediateTails = getAllPermutations(nodeLabelsToEObjects
+			List<List<GenericNode>> newTails = new LinkedList<>();
+			List<List<GenericNode>> intermediateTails = getAllPermutations(nodeLabelsToGenericNodes
 					.get(label));
-			for (List<EObject> tail : tails) {
-				for (List<EObject> intermediateTail : intermediateTails) {
-					List<EObject> newTail = new LinkedList<EObject>();
+			for (List<GenericNode> tail : tails) {
+				for (List<GenericNode> intermediateTail : intermediateTails) {
+					List<GenericNode> newTail = new LinkedList<>();
 					newTail.addAll(tail);
 					newTail.addAll(intermediateTail);
 					newTails.add(newTail);
@@ -294,15 +280,15 @@ public class CanonicalLabelForFragmentCreator {
 			tails = newTails;
 		}
 
-		for (List<EObject> tail : tails) {
+		for (List<GenericNode> tail : tails) {
 			tail.addAll(endTail);
 		}
 
 		return tails;
 	}
 
-	private static List<List<EObject>> getAllPermutations(
-			Set<EObject> nodesOfSameLabel) {
+	private static List<List<GenericNode>> getAllPermutations(
+			Set<GenericNode> nodesOfSameLabel) {
 		return Permutation.permute(nodesOfSameLabel);
 	}
 

@@ -18,7 +18,7 @@ public class EMF2GenericGraph {
 
     private EMF2GenericGraph(Resource model, String label) {
         this.model = model;
-        this.graph = new GenericGraph(label, model);
+        this.graph = new GenericGraph(label);
         nodeMapping = new NodeMapping();
         edgeMapping = new EdgeMapping();
     }
@@ -80,7 +80,7 @@ public class EMF2GenericGraph {
 
         if (src != null && tgt != null) {
             EReferenceInstance referenceInstance = new EReferenceInstance(model, eReference, srcObject, tgtObject);
-            GenericEdge edge = new GenericEdge(eReference.getName(), src, tgt, referenceInstance);
+            GenericEdge edge = new GenericEdge(eReference.getName(), src, tgt);
             if (!edgeMapping.contains(referenceInstance)) {
                 edgeMapping.put(referenceInstance, edge);
                 edgeMapping.put(edge, referenceInstance);

@@ -1,12 +1,15 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import org.eclipse.emf.ecore.EObject;
+import de.hub.mse.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantdrift.clone.models.GenericGraph;
+import de.hub.mse.variantdrift.clone.models.GenericNode;
+import de.uni_marburg.fb12.swt.cloneDetection.atl.CloneMetricResults;
 
 import java.util.*;
 
 public class CloneMatrix {
-	private List<List<EObject>> nodeMatrix = new LinkedList<List<EObject>>();
-	private List<List<Link>> edgeMatrix = new LinkedList<List<Link>>();
+	private List<List<GenericNode>> nodeMatrix = new LinkedList<>();
+	private List<List<GenericEdge>> edgeMatrix = new LinkedList<>();
 
 	public CloneMatrix() {
 	}
@@ -15,12 +18,9 @@ public class CloneMatrix {
 	 * The order of the rows of edgeMatrix and attributeMatrix have to be
 	 * according each other, means the k�ths row of both matrices have to belong
 	 * to the same clone
-	 * 
-	 * @param rules
-	 * @param edgeMatrix
-	 * @param attributeMatrix
+	 *
 	 */
-	public CloneMatrix(List<List<Link>> edgeMatrix, List<List<EObject>> nodeMatrix) {
+	public CloneMatrix(List<List<GenericEdge>> edgeMatrix, List<List<GenericNode>> nodeMatrix) {
 		this.edgeMatrix = edgeMatrix;
 		this.nodeMatrix = nodeMatrix;
 	}
@@ -29,13 +29,13 @@ public class CloneMatrix {
 	 * 
 	 * @return the rules of the clonematrices as a List
 	 */
-	public List<MatchedRule> getRuleList() {
-		List<MatchedRule> allRules = new LinkedList<MatchedRule>();
+	public List<GenericGraph> getRuleList() {
+		List<GenericGraph> allRules = new LinkedList<>();
 		if (edgeMatrix.size() == 0)
 			return allRules;
 		if (edgeMatrix.get(0).size() != 0) {
-			for (List<Link> row : edgeMatrix) {
-				allRules.add(row.get(0).getRule());
+			for (List<GenericEdge> row : edgeMatrix) {
+				allRules.add(row.get(0).getModel());
 			}
 			return allRules;
 		}
@@ -46,26 +46,26 @@ public class CloneMatrix {
 	 * 
 	 * @return all Edges of this CloneMatrix
 	 */
-	public Set<Link> getAllEdges() {
-		Set<Link> allEdges = new HashSet<Link>();
-		for (List<Link> row : edgeMatrix) {
+	public Set<GenericEdge> getAllEdges() {
+		Set<GenericEdge> allEdges = new HashSet<>();
+		for (List<GenericEdge> row : edgeMatrix) {
 			allEdges.addAll(row);
 		}
 		return allEdges;
 	}
 
-	public Set<EObject> getAllNodes() {
-		Set<EObject> allNodes = new HashSet<EObject>();
+	public Set<GenericNode> getAllNodes() {
+		Set<GenericNode> allNodes = new HashSet<GenericNode>();
 
-		for (Link e : getAllEdges()) {
-			allNodes.add(e.getSource());
-			allNodes.add(e.getTarget());
+		for (GenericEdge e : getAllEdges()) {
+			allNodes.add((GenericNode) e.getSourceNode());
+			allNodes.add((GenericNode) e.getTargetNode());
 		}
 
 		return allNodes;
 	}
 
-	public List<List<Link>> getEdgeMatrix() {
+	public List<List<GenericEdge>> getEdgeMatrix() {
 		return edgeMatrix;
 	}
 
@@ -79,7 +79,7 @@ public class CloneMatrix {
 	 *         CapsuleEdges, this means the former CapsuleEdges, which capsuled
 	 *         Attributes are not inculded)
 	 */
-	public int getNumberOfCommonLinks() {
+	public int getNumberOfCommonGenericEdges() {
 		if (edgeMatrix.size() != 0) {
 			return edgeMatrix.get(0).size();
 		}
@@ -123,12 +123,10 @@ public class CloneMatrix {
 		// sb.append(", modules: ");
 		// sb.append(getInvolvedModules().size());
 		sb.append(". Rules: ");
-		Iterator<MatchedRule> it = getRuleList().iterator();
+		Iterator<GenericGraph> it = getRuleList().iterator();
 		while (it.hasNext()) {
-			MatchedRule r = it.next();
-			sb.append(((Module) r.eContainer()).getName());
-			sb.append("::");
-			sb.append(r.getName());
+			GenericGraph r = it.next();
+			sb.append(r.getLabel());
 			if (it.hasNext())
 				sb.append(", ");
 		}
@@ -136,19 +134,19 @@ public class CloneMatrix {
 		return sb.toString();
 	}
 
-	private List<Module> getInvolvedModules() {
-		List<Module> result = new ArrayList<Module>();
-		for (MatchedRule rule : getRuleList())
-			if (!result.contains(rule.eContainer()))
-				result.add((Module) rule.eContainer());
-		return result;
-	}
+//	private List<Module> getInvolvedModules() {
+//		List<Module> result = new ArrayList<Module>();
+//		for (GenericGraph rule : getRuleList())
+//			if (!result.contains(rule.eContainer()))
+//				result.add((Module) rule.eContainer());
+//		return result;
+//	}
 
 	public String getInvolvedNodesString() {
 		StringBuilder result = new StringBuilder();
-		Iterator<EObject> it = nodeMatrix.get(0).iterator();
+		Iterator<GenericNode> it = nodeMatrix.get(0).iterator();
 		while (it.hasNext()) {
-			EObject n = it.next();
+			GenericNode n = it.next();
 			result.append(n);
 			if (it.hasNext())
 				result.append(", ");
@@ -156,10 +154,10 @@ public class CloneMatrix {
 		return result.toString();
 	}
 
-	private String toStringEdgeMatrix(List<List<Link>> edgeMatrix) {
+	private String toStringEdgeMatrix(List<List<GenericEdge>> edgeMatrix) {
 		String res = "";
-		for (List<Link> row : edgeMatrix) {
-			for (Link edge : row) {
+		for (List<GenericEdge> row : edgeMatrix) {
+			for (GenericEdge edge : row) {
 				res = res + edge.toString() + "\t" + "*" + "\t";
 
 			}
@@ -174,7 +172,7 @@ public class CloneMatrix {
 
 	public CloneMetricResults toMetrics() {
 		if (metricResult == null) {
-			int numberOfModules = getInvolvedModules().size();
+			int numberOfModules = 0;
 			int numberOfRules = getRuleList().size();
 			int numberOfInElements = 0;
 			int numberOfFilters = 0;
@@ -185,19 +183,19 @@ public class CloneMatrix {
 			if (nodeMatrix.isEmpty()) {
 				metricResult = new CloneMetricResults(-1, -1, -1, -1, -1, -1, -1);
 			} else {
-				List<EObject> firstEntry = nodeMatrix.get(0);
-				for (EObject o : firstEntry) {
-					if (o instanceof InPatternElement)
-						numberOfInElements++;
-					else if (o instanceof OutPatternElement)
-						numberOfOutElements++;
-					else if (o instanceof Filter)
-						numberOfFilters++;
-					else if (o instanceof Variable)
-						numberOfVariables++;
-					else if (o instanceof Binding)
-						numberOfBindings++;
-				}
+				List<GenericNode> firstEntry = nodeMatrix.get(0);
+//				for (GenericNode o : firstEntry) {
+//					if (o instanceof InPatternElement)
+//						numberOfInElements++;
+//					else if (o instanceof OutPatternElement)
+//						numberOfOutElements++;
+//					else if (o instanceof Filter)
+//						numberOfFilters++;
+//					else if (o instanceof Variable)
+//						numberOfVariables++;
+//					else if (o instanceof Binding)
+//						numberOfBindings++;
+//				}
 			}
 
 			metricResult = new CloneMetricResults(numberOfModules, numberOfRules, numberOfFilters, numberOfVariables, numberOfInElements,

@@ -34,9 +34,6 @@ public abstract class EScanDetection extends CloneDetection {
 
 	/**
 	 * line 4 and 5 from eScan PseudoCode from the article
-	 * 
-	 * @param lattice
-	 * @return
 	 */
 	public Set<Set<Fragment>> eScanGroupAndFilterLattice(List<Set<Fragment>> lattice) {
 		// line 4
@@ -52,7 +49,7 @@ public abstract class EScanDetection extends CloneDetection {
 		Set<GenericEdge> res = new HashSet<>();
 
 		for (Fragment fragment : layer1) {
-			res.addAll(fragment.getCapsuleEdges());
+			res.addAll(fragment.getGenericEdges());
 		}
 
 		return res;
@@ -102,9 +99,7 @@ public abstract class EScanDetection extends CloneDetection {
 	/**
 	 * 
 	 * group Fragments with the same canonical label into a Set
-	 * 
-	 * @param layer
-	 * @return
+	 *
 	 * 
 	 */
 	private Collection<Set<Fragment>> doGroupingStep1(Set<Fragment> layer) {
@@ -126,9 +121,7 @@ public abstract class EScanDetection extends CloneDetection {
 
 	/**
 	 * ensures the non-overlapping Condition
-	 * 
-	 * @param setOfSetsOfSameCanonicalLabeledFragments
-	 * @return
+	 *
 	 */
 	private Collection<Set<Fragment>> doGroupingStep2(Set<Fragment> setOfSameCanonicalLabeledFragments) {
 		return doCliqueCoverGroupping(setOfSameCanonicalLabeledFragments);
@@ -163,7 +156,6 @@ public abstract class EScanDetection extends CloneDetection {
 	 * @param fragment
 	 *            - the cloneCandidates-Set are searched for clones of this
 	 *            Fragment
-	 * @param
 	 * @return a set containing fragment and all of its clones in
 	 *         cloneCandidates
 	 */
@@ -191,8 +183,7 @@ public abstract class EScanDetection extends CloneDetection {
 	}
 
 	/**
-	 * 
-	 * @param cloneCandidates
+	 *
 	 * @return all clones from cloneCandidates
 	 */
 
@@ -213,6 +204,10 @@ public abstract class EScanDetection extends CloneDetection {
 	 * @return all possible Fragments of size 1 from the computation graphs
 	 */
 	protected Set<Fragment> getL1Fragment() {
+		return getFragments();
+	}
+
+	private Set<Fragment> getFragments() {
 		Set<Fragment> res = new HashSet<>();
 
 		for (GenericGraph r : modelGraphMap.keySet()) {
@@ -233,18 +228,7 @@ public abstract class EScanDetection extends CloneDetection {
 	 *         are not based on capsuleEdges, which contains an Attribute
 	 */
 	protected Set<Fragment> getL1FragmentWithoutAttributes() {
-		Set<Fragment> res = new HashSet<>();
-
-		for (GenericGraph r : modelGraphMap.keySet()) {
-			for (GenericEdge h : modelGraphMap.get(r).edgeSet()) {
-				Set<GenericEdge> c = new HashSet<>();
-				c.add(h);
-				Fragment fragment = new Fragment(c, r, modelGraphMap.get(r));
-				res.add(fragment);
-			}
-
-		}
-		return res;
+		return getFragments();
 	}
 
 	protected void printLattice(List<Set<Fragment>> lattice) {
@@ -266,26 +250,25 @@ public abstract class EScanDetection extends CloneDetection {
 	 * 
 	 * @param groupedLayerLattice
 	 *            lattice already grouped accordingly to eScan pseudocode line 4
-	 * @return
 	 */
 	protected Set<Set<Fragment>> eScanFilterLattice(List<Set<Set<Fragment>>> groupedLayerLattice) {
 		if (groupedLayerLattice.isEmpty())
-			return new HashSet<Set<Fragment>>();
+			return new HashSet<>();
 
 		Set<Set<Fragment>> upperLayersUncoveredCloneGroups = groupedLayerLattice.get(groupedLayerLattice.size() - 1);
-		Set<Set<Fragment>> temp = new HashSet<Set<Fragment>>();
+		Set<Set<Fragment>> temp = new HashSet<>();
 
 		for (int i = (groupedLayerLattice.size() - 2); i >= 0; i--) {
 			temp.addAll(getAllUncoveredCGFromLayer(groupedLayerLattice.get(i), upperLayersUncoveredCloneGroups));
 			upperLayersUncoveredCloneGroups.addAll(temp);
-			temp = new HashSet<Set<Fragment>>();
+			temp = new HashSet<>();
 		}
 		return upperLayersUncoveredCloneGroups;
 	}
 
 	private Set<Set<Fragment>> getAllUncoveredCGFromLayer(Set<Set<Fragment>> layer,
 			Set<Set<Fragment>> upperLayersFragments) {
-		Set<Set<Fragment>> allUncoveredCGFromLayer = new HashSet<Set<Fragment>>();
+		Set<Set<Fragment>> allUncoveredCGFromLayer = new HashSet<>();
 		for (Set<Fragment> cloneGroupFromLayer : layer) {
 			boolean isCovered = false;
 			for (Set<Fragment> cloneGroupFromUpperLayers : upperLayersFragments) {

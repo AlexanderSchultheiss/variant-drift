@@ -2,38 +2,38 @@ package de.hub.mse.variantdrift.clone.escan;
 
 //http://stackoverflow.com/questions/11343848/
 
-import org.eclipse.emf.ecore.EObject;
+
+import de.hub.mse.variantdrift.clone.models.GenericNode;
 
 import java.util.*;
 
 // TODO: Check validity of what this is supposed to do.
 public class Permutation {
-
-	public static List<List<EObject>> permute(Set<EObject> nodes) {
+	public static List<List<GenericNode>> permute(Set<GenericNode> nodes) {
 
 		if (nodes.size() == 1) {
-			List<EObject> arrayList = new ArrayList<>();
+			List<GenericNode> arrayList = new ArrayList<>();
 			arrayList.add(nodes.iterator().next());
-			List<List<EObject>> listOfList = new ArrayList<>();
+			List<List<GenericNode>> listOfList = new ArrayList<>();
 			listOfList.add(arrayList);
 			return listOfList;
 		}
 
-		Set<EObject> setOf = new HashSet<>(nodes);
+		Set<GenericNode> setOf = new HashSet<>(nodes);
 
-		List<List<EObject>> listOfLists = new ArrayList<>();
+		List<List<GenericNode>> listOfLists = new ArrayList<>();
 
-		for (EObject i : nodes) {
-			ArrayList<EObject> arrayList = new ArrayList<>();
+		for (GenericNode i : nodes) {
+			ArrayList<GenericNode> arrayList = new ArrayList<>();
 			arrayList.add(i);
 
-			Set<EObject> setOfCopied = new HashSet<>(setOf);
+			Set<GenericNode> setOfCopied = new HashSet<>(setOf);
 			setOfCopied.remove(i);
 
-			Set<EObject> isttt = new HashSet<>(setOfCopied);
+			Set<GenericNode> isttt = new HashSet<>(setOfCopied);
 
-			List<List<EObject>> permute = permute(isttt);
-			for (List<EObject> list : permute) {
+			List<List<GenericNode>> permute = permute(isttt);
+			for (List<GenericNode> list : permute) {
 				list.add(i);
 				listOfLists.add(list);
 			}

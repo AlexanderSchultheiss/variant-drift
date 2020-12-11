@@ -12,13 +12,12 @@ public class GenericEdge implements IDirectedEdge {
     private final String label;
     private final INode sourceNode;
     private final INode targetNode;
-    private final EReferenceInstance originalEReference;
+    private GenericGraph model;
 
-    public GenericEdge(String label, INode sourceNode, INode targetNode, EReferenceInstance originalEReference) {
+    public GenericEdge(String label, INode sourceNode, INode targetNode) {
         this.label = Objects.requireNonNull(label);
         this.sourceNode = Objects.requireNonNull(sourceNode);
         this.targetNode = Objects.requireNonNull(targetNode);
-        this.originalEReference = originalEReference;
     }
 
     @Override
@@ -39,7 +38,15 @@ public class GenericEdge implements IDirectedEdge {
     @Override
     public String toString() {return sourceNode.toString() + " --" + label + "--> " + targetNode.toString();}
 
-    public EReferenceInstance getOriginalReference() {
-        return originalEReference;
+    public GenericEdge getOriginalEdge() {
+        return this;
+    }
+
+    public GenericGraph getModel() {
+        return model;
+    }
+
+    public void setModel(GenericGraph model) {
+        this.model = model;
     }
 }

@@ -105,13 +105,8 @@ public abstract class CloneDetection extends AbstractCloneGroupDetector {
     public CloneGroupDetectionResultAsCloneMatrix
     getResultAsCloneMatrixOrderedByNumberOfCommonElements() {
         List<CloneMatrix> orderedResult = new ArrayList<CloneMatrix>(resultAsCloneMatrix);
-        Comparator<CloneMatrix> comp = new Comparator<CloneMatrix>() {
-            @Override
-            public int compare(CloneMatrix arg0, CloneMatrix arg1) {
-                return arg1.getNumberOfCommonLinks()
-                        - arg0.getNumberOfCommonLinks();
-            }
-        };
+        Comparator<CloneMatrix> comp = (arg0, arg1) -> arg1.getNumberOfCommonGenericEdges()
+                - arg0.getNumberOfCommonGenericEdges();
         orderedResult.sort(comp);
         return new CloneGroupDetectionResultAsCloneMatrix(orderedResult);
     }
