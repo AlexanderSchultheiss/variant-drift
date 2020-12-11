@@ -64,7 +64,7 @@ public class PlayingAround {
         GenericGraph filteredCombinedGraph = combinedGraph.simulateSmallerGraph();
 
         // Conqat
-        System.out.print("Starting Conqat...");
+        System.out.println("Starting Conqat...");
         var cloneDetector = new MyConqatBasedCloneDetector(filteredCombinedGraph);
         cloneDetector.detectCloneGroups();
         var resultConqat = cloneDetector.getResultOrderedBySize();
@@ -74,7 +74,7 @@ public class PlayingAround {
         // EScan
         List<GenericGraph> filteredGraphs = modelGraphs.stream().map(GenericGraph::simulateSmallerGraph).collect(Collectors.toList());
 
-        System.out.print("Starting EScan...");
+        System.out.println("Starting EScan...");
         var escan = new EScanDetectionOriginal(modelGraphs);
         escan.detectCloneGroups();
         System.out.println("done.");
