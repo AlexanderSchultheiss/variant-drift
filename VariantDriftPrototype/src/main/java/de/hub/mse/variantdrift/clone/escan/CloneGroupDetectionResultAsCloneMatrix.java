@@ -9,7 +9,7 @@ import java.util.List;
  *
  */
 public class CloneGroupDetectionResultAsCloneMatrix {
-	private List<CloneMatrix> cloneGroups;
+	private final List<CloneMatrix> cloneGroups;
 
 	public CloneGroupDetectionResultAsCloneMatrix(List<CloneMatrix> cloneGroups) {
 		this.cloneGroups = cloneGroups;
