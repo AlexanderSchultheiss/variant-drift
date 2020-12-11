@@ -1,12 +1,5 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import aatl.MatchedRule;
-import aatl.Module;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.AbstractCloneGroupDetector;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneGroupDetectionResultAsCloneMatrix;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneMatrix;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.ExtendedIntegratedGraphConverter;
 import org.eclipse.emf.ecore.EObject;
 import org.jgrapht.DirectedGraph;
 

@@ -1,9 +1,5 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import aatl.Module;
-import aatl.*;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.CloneMetricResults;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.Link;
 import org.eclipse.emf.ecore.EObject;
 
 import java.util.*;

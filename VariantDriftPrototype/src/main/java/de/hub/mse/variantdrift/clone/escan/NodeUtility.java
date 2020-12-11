@@ -1,8 +1,5 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import aatl.MatchedRule;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.LabelCreator;
 import org.eclipse.emf.ecore.EObject;
 import org.jgrapht.DirectedGraph;
 

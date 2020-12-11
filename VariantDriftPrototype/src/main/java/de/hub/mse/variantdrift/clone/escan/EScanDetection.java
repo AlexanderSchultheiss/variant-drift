@@ -1,10 +1,5 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import aatl.MatchedRule;
-import aatl.Module;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CloneDetection;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.Fragment;
 import org.eclipse.emf.ecore.EObject;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.BronKerboschCliqueFinder;

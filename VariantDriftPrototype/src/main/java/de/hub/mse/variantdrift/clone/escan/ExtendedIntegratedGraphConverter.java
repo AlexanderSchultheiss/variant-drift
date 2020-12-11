@@ -1,10 +1,5 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import aatl.Module;
-import aatl.*;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.Link;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.escan.InputRuleNotSupportedException;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.jgrapht.DirectedGraph;
