@@ -8,63 +8,59 @@ import java.util.*;
 
 
 /**
- * 
  * Provides conversion to CloneGroupMappings for all (temp-) results of the
  * CloneDetections.
- * 
+ * <p>
  * In some special cases this includes addingAttributes.
  */
 public class CloneMatrixCreator {
 
+    private static List<List<GenericEdge>> getGenericEdgeMatrix(
+            Set<Fragment> cloneGroup) {
+        List<List<GenericEdge>> capsuleEdgeMatrix = new LinkedList<>();
 
+        for (Fragment fragment : cloneGroup) {
+            List<GenericEdge> capsuleEdges = fragment.getGenericEdges();
+            capsuleEdgeMatrix.add(capsuleEdges);
+        }
 
-	private static List<List<GenericEdge>> getGenericEdgeMatrix(
-			Set<Fragment> cloneGroup) {
-		List<List<GenericEdge>> capsuleEdgeMatrix = new LinkedList<>();
+        return capsuleEdgeMatrix;
+    }
 
-		for (Fragment fragment : cloneGroup) {
-			List<GenericEdge> capsuleEdges = fragment.getGenericEdges();
-			capsuleEdgeMatrix.add(capsuleEdges);
-		}
+    public static Set<CloneMatrix> convertEScanResult(
+            Set<Set<Fragment>> setOfSetsOfSameCanonicalLabeledNonOverlappingFragments) {
+        Set<CloneMatrix> res = new HashSet<>();
 
-		return capsuleEdgeMatrix;
-	}
+        for (Set<Fragment> fragmentsCloneGroup
+                : setOfSetsOfSameCanonicalLabeledNonOverlappingFragments) {
+            if (fragmentsCloneGroup.size() > 1) {
+                res.add(CloneMatrixCreator.convert(fragmentsCloneGroup));
+            }
+        }
+        return res;
+    }
 
+    private static CloneMatrix convert(Set<Fragment> cloneGroup) {
 
-	public static Set<CloneMatrix> convertEScanResult(
-			Set<Set<Fragment>> setOfSetsOfSameCanonicalLabeledNonOverlappingFragments) {
-		Set<CloneMatrix> res = new HashSet<>();
+        Set<GenericGraph> rules = new HashSet<>();
+        for (Fragment f : cloneGroup) {
+            rules.add(f.getModel());
+        }
 
-		for (Set<Fragment> fragmentsCloneGroup 
-				: setOfSetsOfSameCanonicalLabeledNonOverlappingFragments) {
-			if (fragmentsCloneGroup.size() > 1) {
-				res.add(CloneMatrixCreator.convert(fragmentsCloneGroup));
-			}
-		}
-		return res;
-	}
+        List<List<GenericEdge>> edgeMatrix = new LinkedList<>();
+        List<List<GenericNode>> nodeMatrix = new LinkedList<>();
 
-	private static CloneMatrix convert(Set<Fragment> cloneGroup) {
+        for (Fragment fragment : cloneGroup) {
+            List<GenericEdge> capsuleEdges = fragment.getGenericEdges();
+            List<GenericEdge> originalEdges = new LinkedList<>(capsuleEdges);
+            edgeMatrix.add(originalEdges);
 
-		Set<GenericGraph> rules = new HashSet<>();
-		for (Fragment f : cloneGroup) {
-			rules.add(f.getModel());
-		}
+            List<GenericNode> originalNodes = new ArrayList<>(fragment.getNodes());
+            nodeMatrix.add(originalNodes);
+        }
 
-		List<List<GenericEdge>> edgeMatrix = new LinkedList<>();
-		List<List<GenericNode>> nodeMatrix = new LinkedList<>();
-
-		for (Fragment fragment : cloneGroup) {
-			List<GenericEdge> capsuleEdges = fragment.getGenericEdges();
-			List<GenericEdge> originalEdges = new LinkedList<>(capsuleEdges);
-			edgeMatrix.add(originalEdges);
-
-			List<GenericNode> originalNodes = new ArrayList<>(fragment.getNodes());
-			nodeMatrix.add(originalNodes);
-		}
-
-		return new CloneMatrix(edgeMatrix, nodeMatrix);
-	}
+        return new CloneMatrix(edgeMatrix, nodeMatrix);
+    }
 //
 //	public static Set<CloneGroupMapping> convertEScanResultOld(
 //			Collection<Set<Fragment>> setOfSetsOfSameCanonicalLabeledNonOverlappingFragments) {

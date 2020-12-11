@@ -14,7 +14,6 @@ import java.util.Map;
  */
 public class LabelCreator {
 
-
     /**
      * Since the labels based on more that one part, this parts are separated by
      * an Separator instead of just putting them together to avoid mistakes,
@@ -42,6 +41,7 @@ public class LabelCreator {
     }
 
     /**
+     *
      */
     public static String getModelCdNodeLabel(GenericNode node) {
         if (eScanNodeCache.containsKey(node)) {
