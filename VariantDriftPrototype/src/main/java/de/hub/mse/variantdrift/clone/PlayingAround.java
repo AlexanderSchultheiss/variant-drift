@@ -3,9 +3,16 @@ package de.hub.mse.variantdrift.clone;
 import de.hub.mse.variantdrift.clone.conqat.MyConqatBasedCloneDetector;
 import de.hub.mse.variantdrift.clone.escan.CombinedClone;
 import de.hub.mse.variantdrift.clone.escan.EScanDetectionOriginal;
+import de.hub.mse.variantdrift.clone.escan.Fragment;
 import de.hub.mse.variantdrift.clone.util.*;
 import de.hub.mse.variantdrift.clone.models.GenericGraph;
+import org.conqat.engine.model_clones.model.IDirectedEdge;
+import org.conqat.engine.model_clones.model.INode;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.BronKerboschCliqueFinder;
+import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.graph.DefaultEdge;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,7 +75,7 @@ public class PlayingAround {
         List<GenericGraph> filteredGraphs = modelGraphs.stream().map(GenericGraph::simulateSmallerGraph).collect(Collectors.toList());
 
         System.out.print("Starting EScan...");
-        var escan = new EScanDetectionOriginal(filteredGraphs);
+        var escan = new EScanDetectionOriginal(modelGraphs);
         escan.detectCloneGroups();
 //        GraphViewer.viewGraph(new GenericGraphToJGraph().transform(filteredGraphs.get(0)), "Model 1");
 //        GraphViewer.viewGraph(new GenericGraphToJGraph().transform(filteredGraphs.get(1)), "Model 2");
@@ -79,5 +86,12 @@ public class PlayingAround {
         // Show the combined clones...
         GraphViewer.viewGraph(new GenericGraphToJGraph().transform(combinedClone.get(modelGraphs.get(0))), "Model 1");
         GraphViewer.viewGraph(new GenericGraphToJGraph().transform(combinedClone.get(modelGraphs.get(1))), "Model 2");
+
+        var oneClone = combinedClone.get(modelGraphs.get(0));
+        var jgraphClone = new GenericGraphToJGraph().transform(oneClone);
+        var inspectorConnect = new ConnectivityInspector<>((DirectedGraph<INode, IDirectedEdge>) jgraphClone);
+        var connectedComponents = inspectorConnect.connectedSets();
+        System.out.println("EScan found a clone comprising " + oneClone.getNodes().size() + " nodes and " + oneClone.getEdges().size() + " edges.");
+        System.out.println("The clone contains " + connectedComponents.size() + " cliques.");
     }
 }

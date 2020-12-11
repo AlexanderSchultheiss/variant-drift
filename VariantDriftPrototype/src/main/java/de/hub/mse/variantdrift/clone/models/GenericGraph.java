@@ -58,14 +58,14 @@ public class GenericGraph implements IModelGraph {
         Set<IDirectedEdge> edges = new HashSet<>();
         for (var node : this.nodes) {
             if (node.getEquivalenceClassLabel().contains("Class")
-//                    || node.getEquivalenceClassLabel().contains("Association")
-//                    || node.getEquivalenceClassLabel().contains("Property")
-//                    || node.getEquivalenceClassLabel().contains("Parameter")
-//                    || node.getEquivalenceClassLabel().contains("Operation")
-//                    || node.getEquivalenceClassLabel().contains("EnumerationLiteral")
-//                    || node.getEquivalenceClassLabel().contains("Enumeration")
-//                    || node.getEquivalenceClassLabel().contains("Generalization")
-//                    || node.getEquivalenceClassLabel().contains("Package")
+                    || node.getEquivalenceClassLabel().contains("Association")
+                    || node.getEquivalenceClassLabel().contains("Property")
+                    || node.getEquivalenceClassLabel().contains("Parameter")
+                    || node.getEquivalenceClassLabel().contains("Operation")
+                    || node.getEquivalenceClassLabel().contains("EnumerationLiteral")
+                    || node.getEquivalenceClassLabel().contains("Enumeration")
+                    || node.getEquivalenceClassLabel().contains("Generalization")
+                    || node.getEquivalenceClassLabel().contains("Package")
             ) {
                 nodes.add(node);
             }
