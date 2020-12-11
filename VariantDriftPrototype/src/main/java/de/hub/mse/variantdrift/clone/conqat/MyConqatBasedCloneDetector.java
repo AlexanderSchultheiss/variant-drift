@@ -56,7 +56,7 @@ public class MyConqatBasedCloneDetector {
     private static void visualizeClone(ModelCloneReporterMock.ModelClone clone) {
         var nodes = clone.nodes.get(0);
         var edges = clone.edges.get(0);
-        var graph = new GenericGraph(new HashSet<>(nodes), new HashSet<>(edges));
+        var graph = new GenericGraph("Model", null, new HashSet<>(nodes), new HashSet<>(edges));
         var jGraph = new GenericGraphToJGraph().transform(graph);
         GraphViewer.viewGraph(jGraph, "Clone");
     }

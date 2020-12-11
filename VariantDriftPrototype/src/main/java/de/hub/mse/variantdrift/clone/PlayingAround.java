@@ -45,13 +45,13 @@ public class PlayingAround {
         List<NodeMapping> nodeMappings = new LinkedList<>();
         List<EdgeMapping> edgeMappings = new LinkedList<>();
         for (var model : models) {
-            EMF2GenericGraph.ParseResult parseResult = EMF2GenericGraph.transform(model);
+            EMF2GenericGraph.ParseResult parseResult = EMF2GenericGraph.transform(model, model.toString());
             modelGraphs.add(parseResult.graph);
             nodeMappings.add(parseResult.nodeMapping);
             edgeMappings.add(parseResult.edgeMapping);
         }
 //        GenericGraph filteredGraph = (GenericGraph) modelGraph;
-        var graph = GenericGraph.fromGraphs(modelGraphs);
+        var graph = GenericGraph.fromGraphs("Combined Graph", modelGraphs);
         GenericGraph filteredGraph = graph.simulateSmallerGraph();
 
         var cloneDetector = new MyConqatBasedCloneDetector(filteredGraph);

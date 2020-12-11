@@ -1,5 +1,6 @@
 package de.hub.mse.variantdrift.clone.models;
 
+import de.hub.mse.variantdrift.clone.util.EReferenceInstance;
 import org.conqat.engine.model_clones.model.IDirectedEdge;
 import org.conqat.engine.model_clones.model.INode;
 import org.eclipse.emf.henshin.variability.mergein.normalize.HenshinEdge;
@@ -11,11 +12,13 @@ public class GenericEdge implements IDirectedEdge {
     private final String label;
     private final INode sourceNode;
     private final INode targetNode;
+    private final EReferenceInstance originalEReference;
 
-    public GenericEdge(String label, INode sourceNode, INode targetNode) {
+    public GenericEdge(String label, INode sourceNode, INode targetNode, EReferenceInstance originalEReference) {
         this.label = Objects.requireNonNull(label);
         this.sourceNode = Objects.requireNonNull(sourceNode);
         this.targetNode = Objects.requireNonNull(targetNode);
+        this.originalEReference = originalEReference;
     }
 
     @Override
@@ -35,4 +38,8 @@ public class GenericEdge implements IDirectedEdge {
 
     @Override
     public String toString() {return sourceNode.toString() + " --" + label + "--> " + targetNode.toString();}
+
+    public EReferenceInstance getOriginalReference() {
+        return originalEReference;
+    }
 }

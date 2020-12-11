@@ -1,16 +1,16 @@
 package de.hub.mse.variantdrift.clone.escan;
 
+import de.hub.mse.variantdrift.clone.models.GenericGraph;
 import de.uni_marburg.fb12.swt.cloneDetection.atl.conqat.CloneGroup;
 import de.uni_marburg.fb12.swt.cloneDetection.atl.conqat.CloneGroupDetectionResult;
-import org.eclipse.emf.ecore.resource.Resource;
 
 import java.util.*;
 
 public abstract class AbstractCloneGroupDetector {
-	protected List<Resource> models;
+	protected List<GenericGraph> models;
 	protected Set<CloneGroup> result;
 
-	public AbstractCloneGroupDetector(List<Resource> models) {
+	public AbstractCloneGroupDetector(List<GenericGraph> models) {
 		this.models = models;
 	}
 

@@ -1,5 +1,6 @@
 package de.hub.mse.variantdrift.clone.escan;
 
+import aatl.MatchedRule;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.jgrapht.DirectedGraph;

@@ -16,15 +16,15 @@ public class EMF2GenericGraph {
     NodeMapping nodeMapping;
     EdgeMapping edgeMapping;
 
-    private EMF2GenericGraph(Resource model) {
+    private EMF2GenericGraph(Resource model, String label) {
         this.model = model;
-        this.graph = new GenericGraph();
+        this.graph = new GenericGraph(label, model);
         nodeMapping = new NodeMapping();
         edgeMapping = new EdgeMapping();
     }
 
-    public static ParseResult transform(Resource model) {
-        var parser = new EMF2GenericGraph(model);
+    public static ParseResult transform(Resource model, String label) {
+        var parser = new EMF2GenericGraph(model, label);
 
         parser.transformNodes();
         parser.transformEdges();
@@ -79,8 +79,8 @@ public class EMF2GenericGraph {
         GenericNode tgt = nodeMapping.get(tgtObject);
 
         if (src != null && tgt != null) {
-            GenericEdge edge = new GenericEdge(eReference.getName(), src, tgt);
-            EReferenceInstance referenceInstance = new EReferenceInstance(eReference, srcObject, tgtObject);
+            EReferenceInstance referenceInstance = new EReferenceInstance(model, eReference, srcObject, tgtObject);
+            GenericEdge edge = new GenericEdge(eReference.getName(), src, tgt, referenceInstance);
             if (!edgeMapping.contains(referenceInstance)) {
                 edgeMapping.put(referenceInstance, edge);
                 edgeMapping.put(edge, referenceInstance);

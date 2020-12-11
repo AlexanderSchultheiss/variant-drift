@@ -1,6 +1,9 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import org.eclipse.emf.ecore.EObject;
+import de.hub.mse.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantdrift.clone.models.GenericGraph;
+import de.hub.mse.variantdrift.clone.models.GenericNode;
+import de.hub.mse.variantdrift.clone.util.EReferenceInstance;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 
@@ -11,32 +14,29 @@ import java.util.*;
  *
  */
 public class Fragment {
-	private final List<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> orderedCapsuleEdges;
-	private final MatchedRule rule;
-	private final DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> graph;
-	private String label;
+	private final List<GenericEdge> orderedCapsuleEdges;
+	private final GenericGraph model;
+	private final DirectedGraph<GenericNode, GenericEdge> graph;
+	private final String label;
 
-	private de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge lastNotDisconnectingCapsuleEdge;
+	private GenericEdge lastNotDisconnectingCapsuleEdge;
 
 	@Override
 	public int hashCode() {
-		int res = rule.getName().hashCode();
+		int res = model.getLabel().hashCode();
 		res = res + label.hashCode();
 		return res;
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		Fragment fragment = (Fragment) o;
-
-		if (this.rule != fragment.rule) {
+		if (!(o instanceof Fragment fragment)) {
 			return false;
 		}
-		if (!fragment.orderedCapsuleEdges.equals(orderedCapsuleEdges)) {
+		if (this.model != fragment.model) {
 			return false;
 		}
-
-		return true;
+		return fragment.orderedCapsuleEdges.equals(orderedCapsuleEdges);
 	}
 
 	/**
@@ -54,21 +54,20 @@ public class Fragment {
 
 	@Override
 	public String toString() {
-		String res = rule.getName() + "\n Label: " + label;
-		return res;
+		return model.getLabel() + "\n Label: " + label;
 	}
 
 	/**
 	 * 
 	 * @return the source- and target-Nodes of the Edges of this Fragment
 	 */
-	public List<EObject> getNodes() {
-		List<EObject> nodes = new ArrayList<EObject>();
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge capsuleEdge : orderedCapsuleEdges) {
-			if (!nodes.contains(graph.getEdgeSource(capsuleEdge)))
-				nodes.add(graph.getEdgeSource(capsuleEdge));
-			if (!nodes.contains(graph.getEdgeTarget(capsuleEdge)))
-				nodes.add(graph.getEdgeTarget(capsuleEdge));
+	public List<GenericNode> getNodes() {
+		List<GenericNode> nodes = new ArrayList<>();
+		for (GenericEdge genericEdge : orderedCapsuleEdges) {
+			if (!nodes.contains(graph.getEdgeSource(genericEdge)))
+				nodes.add(graph.getEdgeSource(genericEdge));
+			if (!nodes.contains(graph.getEdgeTarget(genericEdge)))
+				nodes.add(graph.getEdgeTarget(genericEdge));
 		}
 		return nodes;
 	}
@@ -77,7 +76,7 @@ public class Fragment {
 	 * 
 	 * @return all the CapsuleEdges this Fragment exist of
 	 */
-	public List<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> getCapsuleEdges() {
+	public List<GenericEdge> getCapsuleEdges() {
 		return orderedCapsuleEdges;
 	}
 
@@ -97,10 +96,10 @@ public class Fragment {
 	 * 
 	 * @return all original edges (that is Henhsin-edges) of this Fragment
 	 */
-	public Set<Link> getOriginalEdges() {
-		Set<Link> res = new HashSet<Link>();
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e : orderedCapsuleEdges) {
-				res.add(e.getOriginalEdge());
+	public Set<EReferenceInstance> getOriginalEdges() {
+		Set<EReferenceInstance> res = new HashSet<>();
+		for (GenericEdge e : orderedCapsuleEdges) {
+				res.add(e.getOriginalReference());
 		}
 		return res;
 	}
@@ -110,25 +109,25 @@ public class Fragment {
 	 * 
 	 * @return the rule this Fragment belongs to
 	 */
-	public MatchedRule getRule() {
-		return rule;
+	public GenericGraph getModel() {
+		return model;
 	}
 
 	/**
 	 * 
 	 * @return the whole computation graph this Fragment belongs to
 	 */
-	public DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> getGraph() {
+	public DirectedGraph<GenericNode, GenericEdge> getGraph() {
 		return graph;
 	}
 
-	public Fragment(Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> capsuleEdges, MatchedRule rule,
-                    DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> graph) {
-		this.rule = rule;
+	public Fragment(Set<GenericEdge> genericEdges, GenericGraph model,
+                    DirectedGraph<GenericNode, GenericEdge> graph) {
+		this.model = model;
 		this.graph = graph;
-		DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> fragmentGraph = getFragmentAsGraph(
-				capsuleEdges, graph);
-		Map<String, List<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge>> labelToOrderedCapsuleEdges = CanonicalLabelForFragmentCreator
+		DirectedGraph<GenericNode, GenericEdge> fragmentGraph = getFragmentAsGraph(
+				genericEdges, graph);
+		Map<String, List<GenericEdge>> labelToOrderedCapsuleEdges = CanonicalLabelForFragmentCreator
 				.getCanonicalLabel(fragmentGraph);
 		this.label = labelToOrderedCapsuleEdges.keySet().iterator().next();
 		this.orderedCapsuleEdges = labelToOrderedCapsuleEdges.get(label);
@@ -143,13 +142,7 @@ public class Fragment {
 	 *         biggerFragment <code>false</code> else
 	 */
 	public boolean isSubFragment(Fragment biggerFragment) {
-		if (biggerFragment.orderedCapsuleEdges.size() < orderedCapsuleEdges
-				.size()) {
-			//System.out.println("Fragment.java: biggerFragment.size(): "
-			//		+ biggerFragment.orderedCapsuleEdges.size()
-			//		+ " this.size() " + orderedCapsuleEdges.size());
-		}
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e : orderedCapsuleEdges) {
+		for (GenericEdge e : orderedCapsuleEdges) {
 			if (!biggerFragment.orderedCapsuleEdges.contains(e)) {
 				return false;
 			}
@@ -167,25 +160,25 @@ public class Fragment {
 	 *         Node <code>false</code> else
 	 */
 	public boolean isNodeOverlapping(Fragment f) {
-		if (this.rule != f.getRule()) {
+		if (this.model != f.getModel()) {
 			return false;
 		}
 
-		Set<EObject> nodesThis = new HashSet<EObject>();
-		Set<EObject> nodesF = new HashSet<EObject>();
-		DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> graphF = f.getGraph();
+		Set<GenericNode> nodesThis = new HashSet<>();
+		Set<GenericNode> nodesF = new HashSet<>();
+		DirectedGraph<GenericNode, GenericEdge> graphF = f.getGraph();
 
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e : orderedCapsuleEdges) {
+		for (GenericEdge e : orderedCapsuleEdges) {
 			nodesThis.add(graph.getEdgeSource(e));
 			nodesThis.add(graph.getEdgeTarget(e));
 		}
 
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e : f.orderedCapsuleEdges) {
+		for (GenericEdge e : f.orderedCapsuleEdges) {
 			nodesF.add(graphF.getEdgeSource(e));
 			nodesF.add(graphF.getEdgeTarget(e));
 		}
 
-		for (EObject  n : nodesThis) {
+		for (GenericNode  n : nodesThis) {
 			if (nodesF.contains(n)) {
 				return true;
 			}
@@ -193,19 +186,14 @@ public class Fragment {
 		return false;
 	}
 
-	/**
-	 * 
-	 * @param ckp1
-	 * @return
-	 */
 	public boolean isGeneratingParent(Fragment ckp1) {
-		if (ckp1.getRule() != rule) {
+		if (ckp1.getModel() != model) {
 			return false;
 		}
 		// determine the edge the fragments differ from each other
-		de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge additionalEdge = null;
+		GenericEdge additionalEdge = null;
 		boolean foundAdditionalEdge = false;
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e : ckp1.orderedCapsuleEdges) {
+		for (GenericEdge e : ckp1.orderedCapsuleEdges) {
 			if (!orderedCapsuleEdges.contains(e)) {
 				if (foundAdditionalEdge) {
 					return false;
@@ -215,18 +203,15 @@ public class Fragment {
 			}
 		}
 
-		if (additionalEdge == ckp1.lastNotDisconnectingCapsuleEdge()) {
-			return true;
-		}
-		return false;
+		return additionalEdge == ckp1.lastNotDisconnectingCapsuleEdge();
 	}
 
-	private de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge lastNotDisconnectingCapsuleEdge() {
+	private GenericEdge lastNotDisconnectingCapsuleEdge() {
 		if (lastNotDisconnectingCapsuleEdge != null) {
 			return lastNotDisconnectingCapsuleEdge;
 		}
 
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge testEdge : orderedCapsuleEdges) {
+		for (GenericEdge testEdge : orderedCapsuleEdges) {
 			if (!(isTheOnlyConnectingCapsuleEdge(testEdge))) {
 				lastNotDisconnectingCapsuleEdge = testEdge;
 				return lastNotDisconnectingCapsuleEdge;
@@ -239,18 +224,16 @@ public class Fragment {
 	/**
 	 * if e is the only connecting edge, the remaining fragments is not
 	 * completely connected
-	 * 
-	 * @param e
-	 * @return
+	 *
 	 */
-	private boolean isTheOnlyConnectingCapsuleEdge(de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e) {
-		Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> capsuleEdgesWithoutE = new HashSet<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge>();
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge edge : orderedCapsuleEdges) {
+	private boolean isTheOnlyConnectingCapsuleEdge(GenericEdge e) {
+		Set<GenericEdge> genericEdgesWithoutE = new HashSet<>();
+		for (GenericEdge edge : orderedCapsuleEdges) {
 			if (edge != e) {
-				capsuleEdgesWithoutE.add(edge);
+				genericEdgesWithoutE.add(edge);
 			}
 		}
-		return !(isConnected(capsuleEdgesWithoutE, graph));
+		return !(isConnected(genericEdgesWithoutE, graph));
 	}
 
 	/**
@@ -263,39 +246,35 @@ public class Fragment {
 	 * notConnected --> retrun false found one -- > start search again
 	 * 
 	 * no remaining CapsuleEdges --> isConnected --> retrun true
-	 * 
-	 * @param testcapsuleEdgeset
-	 * @param graph
-	 * @return
 	 */
 
-	public static boolean isConnected(Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> testCapsuleEdgeSet,
-			DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> graph) {
+	public static boolean isConnected(Set<GenericEdge> testCapsuleEdgeSet,
+			DirectedGraph<GenericNode, GenericEdge> graph) {
 		if (testCapsuleEdgeSet.size() == 1) {
 			return true;
 		}
 
-		Set<EObject> nodes = new HashSet<EObject>();
-		Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> successfulTestedCapsuleEdges = new HashSet<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge>();
+		Set<GenericNode> nodes = new HashSet<>();
+		Set<GenericEdge> successfulTestedCapsuleEdges = new HashSet<>();
 
-		Iterator<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> testcapsuleEdgesetIterator = testCapsuleEdgeSet
+		Iterator<GenericEdge> testgenericEdgesetIterator = testCapsuleEdgeSet
 				.iterator();
-		if (testcapsuleEdgesetIterator.hasNext()) {
-			de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e = testcapsuleEdgesetIterator.next();
+		if (testgenericEdgesetIterator.hasNext()) {
+			GenericEdge e = testgenericEdgesetIterator.next();
 			successfulTestedCapsuleEdges.add(e);
 			nodes.add(graph.getEdgeSource(e));
 			nodes.add(graph.getEdgeTarget(e));
 		}
 
-		boolean foundSuccessfulTestedCapsuleEdges = false;
+		boolean foundSuccessfulTestedCapsuleEdges;
 
 		while (testCapsuleEdgeSet.size() != successfulTestedCapsuleEdges.size()) {
 			foundSuccessfulTestedCapsuleEdges = false;
 
-			for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e : testCapsuleEdgeSet) {
+			for (GenericEdge e : testCapsuleEdgeSet) {
 				if (!successfulTestedCapsuleEdges.contains(e)) {
-					EObject source = graph.getEdgeSource(e);
-					EObject target = graph.getEdgeTarget(e);
+					GenericNode source = graph.getEdgeSource(e);
+					GenericNode target = graph.getEdgeTarget(e);
 					if (nodes.contains(source) || nodes.contains(target)) {
 						nodes.add(source);
 						nodes.add(target);
@@ -325,18 +304,17 @@ public class Fragment {
 	 *         is extended with one of the CapsuleEdges from
 	 *         onlyThisCapsuleEdges
 	 */
-	public Set<Fragment> extensOp(Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> onlyThisCapsuleEdges) {
-		Set<Fragment> res = new HashSet<Fragment>();
+	public Set<Fragment> extensOp(Set<GenericEdge> onlyThisCapsuleEdges) {
+		Set<Fragment> res = new HashSet<>();
 
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge capsuleEdge : onlyThisCapsuleEdges) {
-			if (!orderedCapsuleEdges.contains(capsuleEdge)) {
-				if ((graph.containsEdge(capsuleEdge))
-						&& (isConnectedTo(capsuleEdge, orderedCapsuleEdges,
+		for (GenericEdge genericEdge : onlyThisCapsuleEdges) {
+			if (!orderedCapsuleEdges.contains(genericEdge)) {
+				if ((graph.containsEdge(genericEdge))
+						&& (isConnectedTo(genericEdge, orderedCapsuleEdges,
 								graph))) {
-					Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> tempCapsuleEdges = new HashSet<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge>();
-					tempCapsuleEdges.addAll(orderedCapsuleEdges);
-					tempCapsuleEdges.add(capsuleEdge);
-					Fragment temp = new Fragment(tempCapsuleEdges, rule, graph);
+					Set<GenericEdge> tempCapsuleEdges = new HashSet<>(orderedCapsuleEdges);
+					tempCapsuleEdges.add(genericEdge);
+					Fragment temp = new Fragment(tempCapsuleEdges, model, graph);
 					res.add(temp);
 
 				}
@@ -346,65 +324,56 @@ public class Fragment {
 	}
 
 	/**
-	 * 
-	 * @param capsuleEdge
 	 * @return a fragment that is created, when this fragment would be extended
-	 *         with capsuleEdge
+	 *         with genericEdge
 	 */
-	public Fragment extensOp(de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge capsuleEdge) {
+	public Fragment extensOp(GenericEdge genericEdge) {
 
-		if (!orderedCapsuleEdges.contains(capsuleEdge)) {
-			if ((graph.containsEdge(capsuleEdge))
-					&& (isConnectedTo(capsuleEdge, orderedCapsuleEdges, graph))) {
-				Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> tempCapsuleEdges = new HashSet<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge>();
-				tempCapsuleEdges.addAll(orderedCapsuleEdges);
-				tempCapsuleEdges.add(capsuleEdge);
+		if (!orderedCapsuleEdges.contains(genericEdge)) {
+			if ((graph.containsEdge(genericEdge))
+					&& (isConnectedTo(genericEdge, orderedCapsuleEdges, graph))) {
+				Set<GenericEdge> tempCapsuleEdges = new HashSet<>(orderedCapsuleEdges);
+				tempCapsuleEdges.add(genericEdge);
 
-				Fragment res = new Fragment(tempCapsuleEdges, rule, graph);
-				return res;
-
+				return new Fragment(tempCapsuleEdges, model, graph);
 			}
-
 		}
 		return null;
 	}
 
-	private boolean isConnectedTo(de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge e,
-                                  List<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> listCapsuleEdges,
-                                  DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> graph) {
+	private boolean isConnectedTo(GenericEdge e,
+                                  List<GenericEdge> listCapsuleEdges,
+                                  DirectedGraph<GenericNode, GenericEdge> graph) {
 		
-			if (e.getOriginalEdge().getRule() != rule) {
+			if (e.getOriginalReference().model != model.getModel()) {
 				return false;
 			}
 		
 
-		Set<EObject> nodes = new HashSet<EObject>();
-		for (de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge edge : listCapsuleEdges) {
+		Set<GenericNode> nodes = new HashSet<>();
+		for (GenericEdge edge : listCapsuleEdges) {
 			nodes.add(graph.getEdgeSource(edge));
 			nodes.add(graph.getEdgeTarget(edge));
 		}
 		if (nodes.contains(graph.getEdgeSource(e))) {
 			return true;
 		}
-		if (nodes.contains(graph.getEdgeTarget(e))) {
-			return true;
-		}
-		return false;
+		return nodes.contains(graph.getEdgeTarget(e));
 	}
 
-	private DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> getFragmentAsGraph(
-			Set<de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> capsuleEdges,
-			DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> graph) {
-		DirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge> fragmentGraph
-				= new DefaultDirectedGraph<EObject, de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge>(
-				de.uni_marburg.fb12.swt.cloneDetection.atl.escan.CapsuleEdge.class);
+	private DirectedGraph<GenericNode, GenericEdge> getFragmentAsGraph(
+			Set<GenericEdge> genericEdges,
+			DirectedGraph<GenericNode, GenericEdge> graph) {
+		DirectedGraph<GenericNode, GenericEdge> fragmentGraph
+				= new DefaultDirectedGraph<>(
+				GenericEdge.class);
 
-		for (CapsuleEdge capsuleEdge : capsuleEdges) {
-			EObject source = graph.getEdgeSource(capsuleEdge);
-			EObject target = graph.getEdgeTarget(capsuleEdge);
+		for (GenericEdge genericEdge : genericEdges) {
+			GenericNode source = graph.getEdgeSource(genericEdge);
+			GenericNode target = graph.getEdgeTarget(genericEdge);
 			fragmentGraph.addVertex(source);
 			fragmentGraph.addVertex(target);
-			fragmentGraph.addEdge(source, target, capsuleEdge);
+			fragmentGraph.addEdge(source, target, genericEdge);
 		}
 
 		return fragmentGraph;

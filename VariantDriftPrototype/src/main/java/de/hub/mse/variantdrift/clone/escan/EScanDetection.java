@@ -1,6 +1,8 @@
 package de.hub.mse.variantdrift.clone.escan;
 
-import org.eclipse.emf.ecore.EObject;
+import de.hub.mse.variantdrift.clone.models.GenericEdge;
+import de.hub.mse.variantdrift.clone.models.GenericGraph;
+import de.hub.mse.variantdrift.clone.models.GenericNode;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.BronKerboschCliqueFinder;
 import org.jgrapht.graph.DefaultEdge;
@@ -22,16 +24,11 @@ import java.util.*;
  */
 public abstract class EScanDetection extends CloneDetection {
 	
-	public EScanDetection(List<MatchedRule> rules) {
-		super(rules);
-	}
-	
-
-	public EScanDetection(Set<Module> modules) {
-		super(modules);
+	public EScanDetection(List<GenericGraph> models) {
+		super(models);
 	}
 
-	public EScanDetection(Map<MatchedRule, DirectedGraph<EObject, CapsuleEdge>> ruleGraphMap, List<MatchedRule> rules) {
+	public EScanDetection(Map<GenericGraph, DirectedGraph<GenericNode, GenericEdge>> ruleGraphMap, List<GenericGraph> rules) {
 		super(ruleGraphMap, rules);
 	}
 
@@ -47,14 +44,12 @@ public abstract class EScanDetection extends CloneDetection {
 		List<Set<Set<Fragment>>> groupedLayerLattice = groupFragmentsInToCloneGroupsStep2(groupedLayerLatticeStep1);
 
 		// line 5
-		Set<Set<Fragment>> articleFilteredCG = eScanFilterLattice(groupedLayerLattice);
 		// line 6
-		return articleFilteredCG;
-
+		return eScanFilterLattice(groupedLayerLattice);
 	}
 
-	protected Set<CapsuleEdge> extractEdges(Set<Fragment> layer1) {
-		Set<CapsuleEdge> res = new HashSet<CapsuleEdge>();
+	protected Set<GenericEdge> extractEdges(Set<Fragment> layer1) {
+		Set<GenericEdge> res = new HashSet<>();
 
 		for (Fragment fragment : layer1) {
 			res.addAll(fragment.getCapsuleEdges());
@@ -64,7 +59,7 @@ public abstract class EScanDetection extends CloneDetection {
 	}
 
 	private List<Collection<Set<Fragment>>> groupFragmentsInToCloneGroupsStep1(List<Set<Fragment>> lattice) {
-		List<Collection<Set<Fragment>>> groupedLayerLattice = new LinkedList<Collection<Set<Fragment>>>();
+		List<Collection<Set<Fragment>>> groupedLayerLattice = new LinkedList<>();
 		for (Set<Fragment> layer : lattice) {
 			groupedLayerLattice.add(groupFragmentsInToCloneGroupsStep1(layer));
 		}
@@ -73,13 +68,12 @@ public abstract class EScanDetection extends CloneDetection {
 	}
 
 	private Collection<Set<Fragment>> groupFragmentsInToCloneGroupsStep1(Set<Fragment> layer) {
-		Collection<Set<Fragment>> collectionOfSetsOfSameCanonicalLabeledFragments = doGroupingStep1(layer);
-		return collectionOfSetsOfSameCanonicalLabeledFragments;
+		return doGroupingStep1(layer);
 	}
 
 	private List<Set<Set<Fragment>>> groupFragmentsInToCloneGroupsStep2(
 			List<Collection<Set<Fragment>>> groupedLayerLatticeStep1) {
-		List<Set<Set<Fragment>>> groupedLayerLattice = new LinkedList<Set<Set<Fragment>>>();
+		List<Set<Set<Fragment>>> groupedLayerLattice = new LinkedList<>();
 		for (Collection<Set<Fragment>> layer : groupedLayerLatticeStep1) {
 			Set<Set<Fragment>> groupedLayer = groupFragmentsInToCloneGroupsStep2(layer);
 			if (groupedLayer.size() >= 1) {
@@ -90,7 +84,7 @@ public abstract class EScanDetection extends CloneDetection {
 	}
 
 	private Set<Set<Fragment>> groupFragmentsInToCloneGroupsStep2(Collection<Set<Fragment>> layer) {
-		Set<Set<Fragment>> groupedLayer = new HashSet<Set<Fragment>>();
+		Set<Set<Fragment>> groupedLayer = new HashSet<>();
 
 		for (Set<Fragment> setOfSameCanonicalLabeledFragments : layer) {
 			Collection<Set<Fragment>> setOfSetOfSameCanonicalLabeledNonOverlappingFragments = doGroupingStep2(
@@ -114,14 +108,14 @@ public abstract class EScanDetection extends CloneDetection {
 	 * 
 	 */
 	private Collection<Set<Fragment>> doGroupingStep1(Set<Fragment> layer) {
-		Map<String, Set<Fragment>> labelsAndFragments = new HashMap<String, Set<Fragment>>();
+		Map<String, Set<Fragment>> labelsAndFragments = new HashMap<>();
 
 		for (Fragment f : layer) {
 			String label = f.getLabel();
-			if (labelsAndFragments.keySet().contains(label)) {
+			if (labelsAndFragments.containsKey(label)) {
 				labelsAndFragments.get(label).add(f);
 			} else {
-				Set<Fragment> fragments = new HashSet<Fragment>();
+				Set<Fragment> fragments = new HashSet<>();
 				fragments.add(f);
 				labelsAndFragments.put(label, fragments);
 			}
@@ -142,14 +136,13 @@ public abstract class EScanDetection extends CloneDetection {
 
 	private Collection<Set<Fragment>> doCliqueCoverGroupping(Set<Fragment> setOfSameCanonicalLabeledFragments) {
 		Pseudograph<Fragment, DefaultEdge> graph = getCliqueCoverGraph(setOfSameCanonicalLabeledFragments);
-		BronKerboschCliqueFinder<Fragment, DefaultEdge> bronKerboschCliqueFinder = new BronKerboschCliqueFinder<Fragment, DefaultEdge>(
+		BronKerboschCliqueFinder<Fragment, DefaultEdge> bronKerboschCliqueFinder = new BronKerboschCliqueFinder<>(
 				graph);
-		Collection<Set<Fragment>> res = bronKerboschCliqueFinder.getAllMaximalCliques();
-		return res;
+		return bronKerboschCliqueFinder.getAllMaximalCliques();
 	}
 
 	private Pseudograph<Fragment, DefaultEdge> getCliqueCoverGraph(Set<Fragment> setOfSameCanonicalLabeledFragments) {
-		Pseudograph<Fragment, DefaultEdge> graph = new Pseudograph<Fragment, DefaultEdge>(DefaultEdge.class);
+		Pseudograph<Fragment, DefaultEdge> graph = new Pseudograph<>(DefaultEdge.class);
 		for (Fragment f : setOfSameCanonicalLabeledFragments) {
 			graph.addVertex(f);
 		}
@@ -176,7 +169,7 @@ public abstract class EScanDetection extends CloneDetection {
 	 */
 
 	protected Set<Fragment> clones(Fragment fragment, Set<Fragment> cloneCandidates) {
-		Set<Fragment> res = new HashSet<Fragment>();
+		Set<Fragment> res = new HashSet<>();
 
 		for (Fragment f : cloneCandidates) {
 			if (f.isIsomorph(fragment)) {
@@ -204,7 +197,7 @@ public abstract class EScanDetection extends CloneDetection {
 	 */
 
 	protected Set<Fragment> clones1(Set<Fragment> cloneCandidates) {
-		Set<Fragment> res = new HashSet<Fragment>(); // LinkedList<Fragment>();
+		Set<Fragment> res = new HashSet<>(); // LinkedList<Fragment>();
 
 		for (Fragment f : cloneCandidates) {
 			Collection<Fragment> clones = clones(f, cloneCandidates);
@@ -220,13 +213,13 @@ public abstract class EScanDetection extends CloneDetection {
 	 * @return all possible Fragments of size 1 from the computation graphs
 	 */
 	protected Set<Fragment> getL1Fragment() {
-		Set<Fragment> res = new HashSet<Fragment>();
+		Set<Fragment> res = new HashSet<>();
 
-		for (MatchedRule r : ruleGraphMap.keySet()) {
-			for (CapsuleEdge h : ruleGraphMap.get(r).edgeSet()) {
-				Set<CapsuleEdge> c = new HashSet<CapsuleEdge>();
+		for (GenericGraph r : modelGraphMap.keySet()) {
+			for (GenericEdge h : modelGraphMap.get(r).edgeSet()) {
+				Set<GenericEdge> c = new HashSet<>();
 				c.add(h);
-				Fragment fragment = new Fragment(c, r, ruleGraphMap.get(r));
+				Fragment fragment = new Fragment(c, r, modelGraphMap.get(r));
 				res.add(fragment);
 			}
 
@@ -240,13 +233,13 @@ public abstract class EScanDetection extends CloneDetection {
 	 *         are not based on capsuleEdges, which contains an Attribute
 	 */
 	protected Set<Fragment> getL1FragmentWithoutAttributes() {
-		Set<Fragment> res = new HashSet<Fragment>();
+		Set<Fragment> res = new HashSet<>();
 
-		for (MatchedRule r : ruleGraphMap.keySet()) {
-			for (CapsuleEdge h : ruleGraphMap.get(r).edgeSet()) {
-				Set<CapsuleEdge> c = new HashSet<CapsuleEdge>();
+		for (GenericGraph r : modelGraphMap.keySet()) {
+			for (GenericEdge h : modelGraphMap.get(r).edgeSet()) {
+				Set<GenericEdge> c = new HashSet<>();
 				c.add(h);
-				Fragment fragment = new Fragment(c, r, ruleGraphMap.get(r));
+				Fragment fragment = new Fragment(c, r, modelGraphMap.get(r));
 				res.add(fragment);
 			}
 

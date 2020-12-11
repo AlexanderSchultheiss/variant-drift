@@ -46,7 +46,7 @@ public class CloneMatrixCreator {
 
 		Set<MatchedRule> rules = new HashSet<MatchedRule>();
 		for (Fragment f : cloneGroup) {
-			rules.add(f.getRule());
+			rules.add(f.getModel());
 		}
 
 		List<List<Link>> edgeMatrix = new LinkedList<List<Link>>();
