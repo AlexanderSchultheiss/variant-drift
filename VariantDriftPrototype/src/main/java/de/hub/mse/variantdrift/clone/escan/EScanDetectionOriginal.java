@@ -43,18 +43,31 @@ public class EScanDetectionOriginal extends EScanDetection {
      */
     private Set<Set<Fragment>> runEScan() {
         List<Set<Fragment>> lattice = new LinkedList<>();
+
+        System.out.print("1/5: Forming L1 Fragments...");
         Set<Fragment> all1Fragments = getL1Fragment();
+        System.out.println("done.");
+
+        System.out.print("2/5: Forming first clones...");
         Set<Fragment> layer1 = clones1(all1Fragments);
+        System.out.println("done.");
+
+        System.out.print("3/5: Extracting edges...");
         Set<GenericEdge> edgesLayer1 = extractEdges(layer1);
+        System.out.println("done.");
 
         lattice.add(layer1);
         int startLayer = 0;
 
         // line 3
+        System.out.print("4/5: Starting deeper clone discovery...");
         for (Fragment f1 : lattice.get(startLayer)) {
             discover(f1, clones(f1, lattice.get(startLayer)), lattice,
                     edgesLayer1, startLayer);
         }
+        System.out.println("done.");
+
+        System.out.print("5/5: Starting grouping and filtering of clones...");
         return eScanGroupAndFilterLattice(lattice);
     }
 

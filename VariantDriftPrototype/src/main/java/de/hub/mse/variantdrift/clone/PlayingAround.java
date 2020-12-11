@@ -77,6 +77,7 @@ public class PlayingAround {
         System.out.print("Starting EScan...");
         var escan = new EScanDetectionOriginal(modelGraphs);
         escan.detectCloneGroups();
+        System.out.println("done.");
 //        GraphViewer.viewGraph(new GenericGraphToJGraph().transform(filteredGraphs.get(0)), "Model 1");
 //        GraphViewer.viewGraph(new GenericGraphToJGraph().transform(filteredGraphs.get(1)), "Model 2");
         var resultEScan = escan.getResultAsCloneMatrixOrderedByNumberOfCommonElements();
