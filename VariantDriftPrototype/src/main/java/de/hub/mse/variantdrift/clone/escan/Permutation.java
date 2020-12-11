@@ -6,36 +6,34 @@ import org.eclipse.emf.ecore.EObject;
 
 import java.util.*;
 
+// TODO: Check validity of what this is supposed to do.
 public class Permutation {
 
 	public static List<List<EObject>> permute(Set<EObject> nodes) {
 
 		if (nodes.size() == 1) {
-			List<EObject> arrayList = new ArrayList<EObject>();
+			List<EObject> arrayList = new ArrayList<>();
 			arrayList.add(nodes.iterator().next());
-			List<List<EObject>> listOfList = new ArrayList<List<EObject>>();
+			List<List<EObject>> listOfList = new ArrayList<>();
 			listOfList.add(arrayList);
 			return listOfList;
 		}
 
-		Set<EObject> setOf = new HashSet<EObject>(nodes);
+		Set<EObject> setOf = new HashSet<>(nodes);
 
-		List<List<EObject>> listOfLists = new ArrayList<List<EObject>>();
+		List<List<EObject>> listOfLists = new ArrayList<>();
 
 		for (EObject i : nodes) {
-			ArrayList<EObject> arrayList = new ArrayList<EObject>();
+			ArrayList<EObject> arrayList = new ArrayList<>();
 			arrayList.add(i);
 
-			Set<EObject> setOfCopied = new HashSet<EObject>();
-			setOfCopied.addAll(setOf);
+			Set<EObject> setOfCopied = new HashSet<>(setOf);
 			setOfCopied.remove(i);
 
-			Set<EObject> isttt = new HashSet<EObject>(setOfCopied);
+			Set<EObject> isttt = new HashSet<>(setOfCopied);
 
 			List<List<EObject>> permute = permute(isttt);
-			Iterator<List<EObject>> iterator = permute.iterator();
-			while (iterator.hasNext()) {
-				List<EObject> list = iterator.next();
+			for (List<EObject> list : permute) {
 				list.add(i);
 				listOfLists.add(list);
 			}

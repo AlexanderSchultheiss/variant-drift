@@ -30,7 +30,7 @@ public abstract class CloneDetection extends AbstractCloneGroupDetector {
 
 	public CloneDetection(Set<Module> modules) {
 		super(modules);
-		initialize(rules);
+		initialize(models);
 	}
 	
 	public CloneDetection(List<MatchedRule> rules) {
