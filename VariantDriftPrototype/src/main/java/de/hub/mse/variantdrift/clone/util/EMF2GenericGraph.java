@@ -81,6 +81,7 @@ public class EMF2GenericGraph {
         if (src != null && tgt != null) {
             EReferenceInstance referenceInstance = new EReferenceInstance(model, eReference, srcObject, tgtObject);
             GenericEdge edge = new GenericEdge(eReference.getName(), src, tgt);
+            edge.setModel(graph);
             if (!edgeMapping.contains(referenceInstance)) {
                 edgeMapping.put(referenceInstance, edge);
                 edgeMapping.put(edge, referenceInstance);

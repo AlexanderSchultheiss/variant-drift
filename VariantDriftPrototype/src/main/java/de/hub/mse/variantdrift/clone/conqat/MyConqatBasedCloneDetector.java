@@ -41,7 +41,7 @@ public class MyConqatBasedCloneDetector {
 
         result = new HashSet<>();
         for (ModelCloneReporterMock.ModelClone clone : reporter.modelClones) {
-            visualizeClone(clone);
+            // visualizeClone(clone);
             List<Module> involvedModules = conqatManager.getInvolvedModules(clone);
             List<MatchedRule> involvedRules = conqatManager.getInvolvedMatchedRules(clone);
             Map<EObject, Set<EObject>> nodeMappings = conqatManager.createNodeMappings(clone);
@@ -113,14 +113,9 @@ public class MyConqatBasedCloneDetector {
     }
 
     public CloneGroupDetectionResult getResultOrderedBySize() {
-        List<CloneGroup> orderedResult = new ArrayList();
-        orderedResult.addAll(this.result);
-        Comparator<CloneGroup> comp = new Comparator<CloneGroup>() {
-            public int compare(CloneGroup arg0, CloneGroup arg1) {
-                return arg1.getSize() - arg0.getSize();
-            }
-        };
-        Collections.sort(orderedResult, comp);
+        List<CloneGroup> orderedResult = new ArrayList<>(this.result);
+        Comparator<CloneGroup> comp = (arg0, arg1) -> arg1.getSize() - arg0.getSize();
+        orderedResult.sort(comp);
         return new CloneGroupDetectionResult(orderedResult);
     }
 }

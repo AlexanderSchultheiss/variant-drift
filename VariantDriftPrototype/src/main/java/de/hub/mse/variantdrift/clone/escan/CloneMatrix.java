@@ -3,14 +3,13 @@ package de.hub.mse.variantdrift.clone.escan;
 import de.hub.mse.variantdrift.clone.models.GenericEdge;
 import de.hub.mse.variantdrift.clone.models.GenericGraph;
 import de.hub.mse.variantdrift.clone.models.GenericNode;
-import de.uni_marburg.fb12.swt.cloneDetection.atl.CloneMetricResults;
 
 import java.util.*;
 
 public class CloneMatrix {
     private List<List<GenericNode>> nodeMatrix = new LinkedList<>();
     private List<List<GenericEdge>> edgeMatrix = new LinkedList<>();
-    private CloneMetricResults metricResult = null;
+    private CloneMetricResult metricResult = null;
 
     public CloneMatrix() {
     }
@@ -152,51 +151,41 @@ public class CloneMatrix {
     }
 
     private String toStringEdgeMatrix(List<List<GenericEdge>> edgeMatrix) {
-        String res = "";
+        StringBuilder res = new StringBuilder();
         for (List<GenericEdge> row : edgeMatrix) {
             for (GenericEdge edge : row) {
-                res = res + edge.toString() + "\t" + "*" + "\t";
+                res.append(edge.toString()).append("\t").append("*").append("\t");
 
             }
-            res = res + "\n";
+            res.append("\n");
         }
-        return res;
+        return res.toString();
     }
 
     public int getSize() {
         return toMetrics().getSize();
     }
 
-    public CloneMetricResults toMetrics() {
+    public CloneMetricResult toMetrics() {
         if (metricResult == null) {
-            int numberOfModules = 0;
-            int numberOfRules = getRuleList().size();
-            int numberOfInElements = 0;
-            int numberOfFilters = 0;
-            int numberOfVariables = 0;
-            int numberOfOutElements = 0;
-            int numberOfBindings = 0;
+            int numberOfNodes = 0;
+            int numberOfEdges = 0;
 
             if (nodeMatrix.isEmpty()) {
-                metricResult = new CloneMetricResults(-1, -1, -1, -1, -1, -1, -1);
+                metricResult = new CloneMetricResult(numberOfNodes, numberOfEdges);
             } else {
-                List<GenericNode> firstEntry = nodeMatrix.get(0);
-//				for (GenericNode o : firstEntry) {
-//					if (o instanceof InPatternElement)
-//						numberOfInElements++;
-//					else if (o instanceof OutPatternElement)
-//						numberOfOutElements++;
-//					else if (o instanceof Filter)
-//						numberOfFilters++;
-//					else if (o instanceof Variable)
-//						numberOfVariables++;
-//					else if (o instanceof Binding)
-//						numberOfBindings++;
-//				}
+                List<GenericNode> firstNodeEntry = nodeMatrix.get(0);
+				for (GenericNode ignored : firstNodeEntry) {
+					numberOfNodes++;
+				}
+
+				List<GenericEdge> firstEdgeEntry = edgeMatrix.get(0);
+				for(GenericEdge ignored : firstEdgeEntry) {
+				    numberOfEdges++;
+                }
             }
 
-            metricResult = new CloneMetricResults(numberOfModules, numberOfRules, numberOfFilters, numberOfVariables, numberOfInElements,
-                    numberOfOutElements, numberOfBindings);
+            metricResult = new CloneMetricResult(numberOfNodes, numberOfEdges);
         }
         return metricResult;
     }

@@ -52,6 +52,7 @@ public abstract class CloneDetection extends AbstractCloneGroupDetector {
             model.getEdges().stream().map(e -> (GenericEdge) e).forEach(e -> {
                 graph.addEdge((GenericNode) e.getSourceNode(), (GenericNode) e.getTargetNode(), e);
             });
+            result.put(model, graph);
         }
         return result;
     }
