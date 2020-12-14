@@ -16,20 +16,20 @@ public class EMF2GenericGraph {
     NodeMapping nodeMapping;
     EdgeMapping edgeMapping;
 
-    private EMF2GenericGraph(Resource model, String label) {
+    public EMF2GenericGraph(Resource model, String label) {
         this.model = model;
         this.graph = new GenericGraph(label);
         nodeMapping = new NodeMapping();
         edgeMapping = new EdgeMapping();
     }
 
-    public static ParseResult transform(Resource model, String label) {
-        var parser = new EMF2GenericGraph(model, label);
+    public ParseResult transform() {
+        transformNodes();
+        transformEdges();
 
-        parser.transformNodes();
-        parser.transformEdges();
-
-        return new ParseResult(parser.graph, parser.nodeMapping, parser.edgeMapping);
+        doPostProcessing();
+        
+        return new ParseResult(graph, nodeMapping, edgeMapping);
     }
 
     private void transformNodes() {
@@ -91,6 +91,13 @@ public class EMF2GenericGraph {
         }
     }
 
+    /**
+     * Subclasses may override this method to do domain-specific post processing
+     */
+    protected void doPostProcessing() {
+		
+	}
+    
     public static class ParseResult {
         public GenericGraph graph;
         public NodeMapping nodeMapping;

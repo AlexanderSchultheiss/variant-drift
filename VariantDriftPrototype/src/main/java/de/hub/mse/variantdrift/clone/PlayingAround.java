@@ -53,7 +53,15 @@ public class PlayingAround {
         List<NodeMapping> nodeMappings = new LinkedList<>();
         List<EdgeMapping> edgeMappings = new LinkedList<>();
         for (var model : models) {
-            EMF2GenericGraph.ParseResult parseResult = EMF2GenericGraph.transform(model, model.toString());
+        	// Instantiate most suitable parser
+        	EMF2GenericGraph parser = null;
+        	if (model.getContents().get(0).eClass().getEPackage().getNsURI().contains("uml")){
+        		parser = new UML2GenericGraph(model, model.toString());
+        	} else {
+        		parser = new EMF2GenericGraph(model, model.toString());
+        	}
+        	
+        	EMF2GenericGraph.ParseResult parseResult = parser.transform();
             modelGraphs.add(parseResult.graph);
             nodeMappings.add(parseResult.nodeMapping);
             edgeMappings.add(parseResult.edgeMapping);
